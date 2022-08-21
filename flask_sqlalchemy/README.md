@@ -51,3 +51,7 @@ A **one-to-one** relationship should exist between the `Employee` and `Departmen
 The steps are similar to creating *One-To-Many* relationships, execpt that we add an additional parameter called `uselist` when creating a ForeignKey & relationship between the models.
 
 We need to make sure that there is only one employee being the head of a department at one time.  So `uselist` is used to make sure that the relationship between the two will **not** be with more than one `employee`.  We set `uselist` to `False` to prevent the relationship pointing to a list.
+
+
+### Many-To-Many ###
+A **many-to-many** relationship should exist between the `Employee` and the `Project`. This relationship will indicate that an employee can work on multiple projects while a project can have multiple employees working on it at the same time.

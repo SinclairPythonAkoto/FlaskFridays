@@ -55,3 +55,7 @@ We need to make sure that there is only one employee being the head of a departm
 
 ### Many-To-Many ###
 A **many-to-many** relationship should exist between the `Employee` and the `Project`. This relationship will indicate that an employee can work on multiple projects while a project can have multiple employees working on it at the same time.
+
+We will craete an *association table* that will have the **ForeignKeys** of the models that we want to connect together.  ***(Notice how we create a db table not model).***  Then we only need to add the relationship to just one of the models (ie `Project` or `Employee`).
+
+We will create a `relationship()` called `members` in the `Project` model. This relationship is made with the `Employee` model - we will use an *association table* to create it. Therefore, we will to need set the `secondary` parameter equal to the table `project_members`. Finally, we will create a `backref` in this relationship so that we can access this project from the `Employee` table. We will name this backref `projects`. This means that `employee.projects` will give us all the projects that this employee is working on.

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Create a Review 
+{% endblock %}
+
+{% block content %}
+<h1>Trust House</h1>
+<p>
+    Welcome to <b>Trust House</b>.
+    Please complete the form below to write a review. 
+</p>
+<h3>Write Review</h3>
+<form action="{{ url_for('homepage') }}" method="post" enctype="multipart/form-data">
+    <label for="reviewContent">Review:</label><br>
+    <textarea name="reviewContent" id="reviewContent" cols="60" rows="20" required></textarea><br>
+    <p>Enter a rating from 1 - 5. <i><b>1 = bad, 5 = excellent</b></i></p>
+    <label for="reviewRating">Rating: </label>
+    <select name="reviewRating" id="reviewRating" required>
+        <option value="" selected disabled>Select a rating</option>
+        <option value="1">1 (bad)</option>
+        <option value="2">2 (could be better)</option>
+        <option value="3">3 (its OK)</option>
+        <option value="4">4 (decent)</option>
+        <option value="5">5 (excellent)</option>
+    </select><br>
+    <label for="reviewer">Reviewed By: </label>
+    <select name="reviewer" id="reviewer" required>
+        <option value="" selected disabled> -- select --</option>
+        <option value="tenant">Tenant</option>
+        <option value="neighbour">Neighbour</option>
+        <option value="visitor">Visitor</option>
+    </select><br>
+    <label for="inputFile">Upload Picture: </label>
+    <input class="form-control-file" type="file" name="inputFile">
+    <br>
+    <h3>Address</h3>
+    <label for="doorNumber">Door Number: </label>
+    <input type="text" name="doorNumber" id="doorNumber" required><br>
+    <label for="streetName">Street Name: </label>
+    <input type="text" name="streetName" id="streetName" placeholder="Enter street name" required><br>
+    <label for="townName">Town: </label>
+    <input type="text" name="townName" id="townName" placeholder="Enter name of town"><br>
+    <label for="cityName">City: </label>
+    <input type="text" name="cityName" id="cityName" placeholder="Enter name of city"><br>
+    <label for="reviewPostcode">Postcode: </label>
+    <input type="text" name="reviewPostcode" id="reviewPostcode" required><br>
+    <button type="submit">Submit Review</button>
+</form>
+
+
+
+{% endblock %}

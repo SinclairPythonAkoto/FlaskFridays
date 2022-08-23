@@ -72,7 +72,7 @@ class Building(db.Model):
     postcode = db.Column(db.String(10), nullable=False)
     reviews = db.relationship('Review', backref='building')
 
-    def __init(self, door_num, street, town, city, postcode):
+    def __init__(self, door_num, street, town, city, postcode):
         self.door_num = door_num
         self.street = street
         self.town = town
@@ -98,19 +98,11 @@ class Review(db.Model):
         self.rendered_pic = rendered_pic
         self.date = date
 
-@app.route('/welcome')
-def hello():
-    print(city[0])
-    print(city)
-    print(town[0])
-    print(town)
-    return 'Welcome to Trust House!'
-
-#
+# homepage to write a new review
 class Home(MethodView):
     def get(self):
         # show page to write a review, href to send people to view reviews on page
-        return 'Hello World!'
+        return render_template('writeReview.html')
     
     def post(self):
         return 'Post request sent and rercieved!'

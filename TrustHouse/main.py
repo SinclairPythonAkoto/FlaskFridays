@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, redirect
 from flask.views import View, MethodView
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -105,7 +105,18 @@ class Home(MethodView):
         return render_template('writeReview.html')
     
     def post(self):
-        return 'Post request sent and rercieved!'
+        # collect all the data from the form to add & query db
+        review_content = request.form['reviewContent']
+        review_rating = request.form['reviewRating']
+        reviewed_by = request.form['reviewer']
+        date = datetime.now()
+        door = request.form['doorNumber']
+        street_name = request.form['streetName']
+        town_name = request.form['townName']
+        city_name = request.form['cityName']
+        review_postcode = request.form['reviewPostcode']
+
+        return render_template('writeReview.html')
 
 class DisplayReviews(MethodView):
     def get(self):
@@ -113,11 +124,12 @@ class DisplayReviews(MethodView):
         return 'Display all reviews from Trust House'
 
     def post(self):
-        return 'filter & search for review via user entrys'
+        return 'filter & search for review via user entries'
 
 # define web route from class routes 
 app.add_url_rule('/', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/reviews', view_func=DisplayReviews.as_view(name='all_reviews'))
 
 if '__main__' == __name__:
+    db.create_all()
     app.run(debug=True)

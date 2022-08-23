@@ -106,5 +106,26 @@ def hello():
     print(town)
     return 'Welcome to Trust House!'
 
+#
+class Home(MethodView):
+    def get(self):
+        # show page to write a review, href to send people to view reviews on page
+        return 'Hello World!'
+    
+    def post(self):
+        return 'Post request sent and rercieved!'
+
+class DisplayReviews(MethodView):
+    def get(self):
+        # return all reviews as default
+        return 'Display all reviews from Trust House'
+
+    def post(self):
+        return 'filter & search for review via user entrys'
+
+# define web route from class routes 
+app.add_url_rule('/', view_func=Home.as_view(name='homepage'))
+app.add_url_rule('/reviews', view_func=DisplayReviews.as_view(name='all_reviews'))
+
 if '__main__' == __name__:
     app.run(debug=True)

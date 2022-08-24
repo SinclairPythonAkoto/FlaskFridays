@@ -196,7 +196,13 @@ class FilterByDoorNumber(MethodView):
 # filter street name
 class FilterByStreetName(MethodView):
     def post(self):
-        return 'filter by street name'
+        user_street_input = request.form['searchStreetName']
+        find_street = db.session.query(Review, Building).join(Building).all()
+        for review, address in find_street:
+            if user_street_input != address.street:
+                void = 'No match found.'
+                return render_template('viewReview.html', void=void)
+            return render_template('viewReview.html', find_street=find_street)
 
 # filter town
 class FilterByTown(MethodView):

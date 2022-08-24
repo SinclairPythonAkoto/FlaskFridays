@@ -163,14 +163,11 @@ class DisplayReviews(MethodView):
         # return all reviews as default
         return render_template('viewReview.html')
 
-    def post(self):
-        return 'filter & search for review via user entries'
-
-
 # display all reviws
 class DisplayAllReviews(MethodView):
     def post(self):
-        return 'show all reviews'
+        get_reviews = Review.query.all()
+        return render_template('viewReview.html', get_reviews=get_reviews)
 
 # filter by review rating
 class FilterByRating(MethodView):

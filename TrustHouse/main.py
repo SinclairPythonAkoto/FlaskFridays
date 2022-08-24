@@ -83,7 +83,6 @@ class Review(db.Model):
     date = db.Column(db.DateTime, nullable=False)
     building_id = db.Column(db.Integer, db.ForeignKey('building.id'))
 
-
 # homepage to write a new review
 class Home(MethodView):
     def get(self):
@@ -172,7 +171,13 @@ class DisplayAllReviews(MethodView):
 # filter by review rating
 class FilterByRating(MethodView):
     def post(self):
-        return 'filter by review ratings'
+        user_rating_input = request.form['searchRating']
+        user_rating_input = int(user_rating_input)
+        find_rating = Review.query.filter_by(rating=user_rating_input).all()
+        if find_rating[0].rating != user_rating_input:
+            void = 'no match found'
+            return void
+        return render_template('viewReview.html', find_rating=find_rating)
 
 # filter by door number
 class FilterByDoorNumber(MethodView):

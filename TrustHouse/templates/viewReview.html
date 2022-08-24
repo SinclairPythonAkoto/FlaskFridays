@@ -83,5 +83,26 @@ Search Reviews
 {% endfor %}
 {% endif %}
 
+{% if find_rating %}
+<h3>All Reviews:</h3>
+{% for review in find_rating %}
+<h5>Review:</h5>
+<p>{{ review.review }}</p>
+<p><i>Reviewed By: </i>{{ review.reviewed_by }}</p>
+<p><i>Date: </i>{{ review.date }}</p>
+<h5>Address:</h5>
+<p>
+    {{ review.building.door_num }}, {{ review.building.street }}, 
+    {% if review.building.town %}
+    {{ review.building.town }}, 
+    {% endif %}
+    {% if review.building.city %}
+    {{ review.building.city }}, 
+    {% endif %}
+    {{ review.building.postcode }}
+</p>
+{% endfor %}
+{% endif %}
+
 
 {% endblock %}

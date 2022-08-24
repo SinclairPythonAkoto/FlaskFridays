@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Search Reviews
+{% endblock %}
+
+{% block content %}
+<h1>View Reviews</h1>
+<p>
+    Find a review by either searching the 
+    <b>
+        door number, street name, town, city or postcode
+    </b>.
+</p>
+
+<form action="{{ url_for('all_reviews') }}" method="post">
+    <button type="submit">All Reviews</button>
+</form>
+<br>
+<form action="{{ url_for('filter_door_num') }}" method="post">
+    <label for="searchDoorNumber">Search by Door Number: </label>
+    <input type="text" name="searchDoorNumber" id="searchDoorNumber" placeholder="Enter a door number" required>
+    <button type="submit">Find Reviews</button>
+</form>
+<br>
+<form action="{{ url_for('filter_street') }}" method="post">
+    <label for="searchStreetName">Search by Street Name: </label>
+    <input type="text" name="searchStreetName" id="searchStreetName" placeholder="Enter a street name" required>
+    <button type="submit">Find Reviews</button>
+</form>
+<br>
+<form action="{{ url_for('filter_town') }}" method="post">
+    <label for="searchTown">Search by Town: </label>
+    <input type="text" name="searchTown" id="searchTown" placeholder="Enter a street name" required>
+    <button type="submit">Find Reviews</button>
+</form>
+<br>
+<form action="{{ url_for('filter_city') }}" method="post">
+    <label for="searchCity">Search by City: </label>
+    <input type="text" name="searchCity" id="searchCity" placeholder="Enter a street name" required>
+    <button type="submit">Find Reviews</button>
+</form>
+<br>
+<form action="{{ url_for('filter_postcode') }}" method="post">
+    <label for="searchPostcode">Search by Postcode: </label>
+    <input type="text" name="searchPostcode" id="searchPostcode" placeholder="Enter a street name" required>
+    <button type="submit">Find Reviews</button>
+</form>
+<br><br>
+<form action="{{ url_for('listed_towns') }}" method="post">
+    <button type="submit">Listed Towns</button>
+</form>
+<br>
+<form action="{{ url_for('listed_cities') }}" method="post">
+    <button type="submit">Listed Towns</button>
+</form>
+<br>
+{% endblock %}

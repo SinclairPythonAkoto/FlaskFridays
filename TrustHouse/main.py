@@ -161,14 +161,67 @@ class Home(MethodView):
 class DisplayReviews(MethodView):
     def get(self):
         # return all reviews as default
-        return 'Display all reviews from Trust House'
+        return render_template('viewReview.html')
 
     def post(self):
         return 'filter & search for review via user entries'
 
+
+# display all reviws
+class DisplayAllReviews(MethodView):
+    def post(self):
+        return 'show all reviews'
+
+# filter by door number
+class FilterByDoorNumber(MethodView):
+    def post(self):
+        filter_door_num = request.form['searchDoorNumber']
+        print(filter_door_num)
+        return 'filter by door number'
+
+# filter street name
+class FilterByStreetName(MethodView):
+    def post(self):
+        return 'filter by street name'
+
+# filter town
+class FilterByTown(MethodView):
+    def post(self):
+        return 'filter by town'
+
+# filter city
+class FilterByCity(MethodView):
+    def post(self):
+        return 'filter by city'
+
+# filter postcode
+class FilterByPostcode(MethodView):
+    def post(self):
+        return 'filter by postcode'
+
+# display all towns listed
+class DisplayAllTowns(MethodView):
+    def post(self):
+        return 'display all towns listed'
+
+# display all cities listed
+class DisplayAllCites(MethodView):
+    def post(self):
+        return 'display all cities'
+
+
 # define web route from class routes 
 app.add_url_rule('/', view_func=Home.as_view(name='homepage'))
-app.add_url_rule('/reviews', view_func=DisplayReviews.as_view(name='all_reviews'))
+app.add_url_rule('/reviews', view_func=DisplayReviews.as_view(name='display_reviews'))
+app.add_url_rule('/reviews/all', view_func=DisplayAllReviews.as_view(name='all_reviews'))
+app.add_url_rule('/reviews/door_number', view_func=FilterByDoorNumber.as_view(name='filter_door_num'))
+app.add_url_rule('/reviews/street', view_func=FilterByStreetName.as_view(name='filter_street'))
+app.add_url_rule('/reviews/town', view_func=FilterByTown.as_view(name='filter_town'))
+app.add_url_rule('/reviews/city', view_func=FilterByCity.as_view(name='filter_city'))
+app.add_url_rule('/reviews/postcode', view_func=FilterByPostcode.as_view(name='filter_postcode'))
+app.add_url_rule('/reviews/listed-towns', view_func=DisplayAllTowns.as_view(name='listed_towns'))
+app.add_url_rule('/reviews/listed-cities', view_func=DisplayAllCites.as_view(name='listed_cities'))
+
 
 if '__main__' == __name__:
     db.create_all()

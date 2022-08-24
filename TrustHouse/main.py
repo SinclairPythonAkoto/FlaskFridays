@@ -182,9 +182,16 @@ class FilterByRating(MethodView):
 # filter by door number
 class FilterByDoorNumber(MethodView):
     def post(self):
-        filter_door_num = request.form['searchDoorNumber']
-        print(filter_door_num)
-        return 'filter by door number'
+        user_door_input = request.form['searchDoorNumber']
+        find_door = db.session.query(Review, Building).join(Building).all()
+        for review, address in find_door:
+            if address.door_num != user_door_input:
+                void = 'no match found'
+                return render_template('viewReview.html', void=void)
+            return render_template(
+                'viewReview.html',
+                find_door=find_door,
+            )
 
 # filter street name
 class FilterByStreetName(MethodView):

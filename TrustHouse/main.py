@@ -172,6 +172,11 @@ class DisplayAllReviews(MethodView):
     def post(self):
         return 'show all reviews'
 
+# filter by review rating
+class FilterByRating(MethodView):
+    def post(self):
+        return 'filter by review ratings'
+
 # filter by door number
 class FilterByDoorNumber(MethodView):
     def post(self):
@@ -214,6 +219,7 @@ class DisplayAllCites(MethodView):
 app.add_url_rule('/', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/reviews', view_func=DisplayReviews.as_view(name='display_reviews'))
 app.add_url_rule('/reviews/all', view_func=DisplayAllReviews.as_view(name='all_reviews'))
+app.add_url_rule('/reviews/rating', view_func=FilterByRating.as_view(name='filter_rating'))
 app.add_url_rule('/reviews/door_number', view_func=FilterByDoorNumber.as_view(name='filter_door_num'))
 app.add_url_rule('/reviews/street', view_func=FilterByStreetName.as_view(name='filter_street'))
 app.add_url_rule('/reviews/town', view_func=FilterByTown.as_view(name='filter_town'))

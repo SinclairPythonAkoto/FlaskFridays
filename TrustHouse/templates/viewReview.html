@@ -17,6 +17,12 @@ Search Reviews
     <button type="submit">All Reviews</button>
 </form>
 <br>
+<form action="{{ url_for('filter_rating') }}" method="post">
+    <label for="searchRating">Search by Review Rating: </label>
+    <input type="number" name="searchRating" id="searchRating" placeholder="Enter a rating from 1 - 5" required>
+    <button type="submit">Find Reviews</button>
+</form>
+<br>
 <form action="{{ url_for('filter_door_num') }}" method="post">
     <label for="searchDoorNumber">Search by Door Number: </label>
     <input type="text" name="searchDoorNumber" id="searchDoorNumber" placeholder="Enter a door number" required>

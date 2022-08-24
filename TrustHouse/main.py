@@ -72,31 +72,17 @@ class Building(db.Model):
     postcode = db.Column(db.String(10), nullable=False)
     reviews = db.relationship('Review', backref='building')
 
-    def __init__(self, door_num, street, town, city, postcode):
-        self.door_num = door_num
-        self.street = street
-        self.town = town
-        self.city = city
-        self.postcode = postcode
-
 # review table
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer, nullable=False)
-    review = db.Column(db.Text, nullable=False)
+    review = db.Column(db.Text, nullable=False, unique=True)
     reviewed_by = db.Column(db.String(20), nullable=False)
     picture_data = db.Column(db.LargeBinary)
     rendered_pic = db.Column(db.Text)
     date = db.Column(db.DateTime, nullable=False)
     building_id = db.Column(db.Integer, db.ForeignKey('building.id'))
 
-    def __init__(self, rating, review, reviewed_by, picture_data, rendered_pic, date):
-        self.rating = rating
-        self.review = review
-        self.reviewed_by = reviewed_by
-        self.picture_data = picture_data
-        self.rendered_pic = rendered_pic
-        self.date = date
 
 # homepage to write a new review
 class Home(MethodView):
@@ -109,15 +95,69 @@ class Home(MethodView):
         review_content = request.form['reviewContent']
         review_rating = request.form['reviewRating']
         reviewed_by = request.form['reviewer']
-        date = datetime.now()
         door = request.form['doorNumber']
         street_name = request.form['streetName']
         town_name = request.form['townName']
         city_name = request.form['cityName']
         review_postcode = request.form['reviewPostcode']
 
-        return render_template('writeReview.html')
+        '''
+        Before we add the information to the db, we need to check if there
+        is an address already existing in the db.  If there is a matching 
+        address then the review will be added to it's relationship.
 
+        If matching door number & matching postcode, add review to matching address.
+        If they do not match, create a new entry for the address & review
+        '''
+
+        # get data from the db to check if they already exist
+        get_door_number = Building.query.filter_by(door_num=door).all()
+        get_postcode = Building.query.filter_by(postcode=review_postcode).all()
+        get_review_conent = Review.query.filter_by(review=review_content).all()
+        print(len(get_postcode))
+        # rearrange try block --> if statement, if len poscode is 0 then create a new entry
+        # else, 
+        # if door & poscode match, and there is a duplicate warn the user, else add new review to existing address
+        if len(get_postcode) == 0:
+            new_address = Building(
+                door_num=door,
+                street=street_name,
+                town=town_name,
+                city=city_name,
+                postcode=review_postcode,
+            )
+            db.session.add(new_address)
+            db.session.commit()
+            new_review = Review(
+                rating=review_rating,
+                review=review_content,
+                reviewed_by=reviewed_by,
+                date=datetime.now(),
+                building=new_address,
+            )
+            db.session.add(new_review)
+            db.session.commit()
+            message = 'Your review has been uploaded!'
+            return message
+        else:    
+            if door == get_door_number[0].door_num and review_postcode == get_postcode[0].postcode:
+                # need to use a try block to check if the review content is not a duplicate
+                if len(get_review_conent) != 0:
+                    message = 'DUPLICATE REVIEW: please check & change the content within your review'
+                    return message
+                new_review = Review(
+                    rating=review_rating,
+                    review=review_content,
+                    reviewed_by=reviewed_by,
+                    date=datetime.now(),
+                    building=get_postcode[0],
+                )
+                db.session.add(new_review)
+                db.session.commit()
+                message = f'A new review has been added to: {get_postcode[0].door_num}, {get_postcode[0].street}'
+                return message
+            
+            
 class DisplayReviews(MethodView):
     def get(self):
         # return all reviews as default
@@ -132,4 +172,21 @@ app.add_url_rule('/reviews', view_func=DisplayReviews.as_view(name='all_reviews'
 
 if '__main__' == __name__:
     db.create_all()
+    # first_address = Building(
+    #     door_num='18',
+    #     street='Kingly Street',
+    #     town='Soho',
+    #     city='London',
+    #     postcode='W18 5PX',
+    # )
+    # first_review = Review(
+    #     rating=3,
+    #     review='Your review goes here...',
+    #     reviewed_by='tenant',
+    #     date=datetime.now(),
+    #     building=first_address,
+    # )
+    # default_data = [first_address, first_review]
+    # db.session.add_all(default_data)
+    # db.session.commit()
     app.run(debug=True)

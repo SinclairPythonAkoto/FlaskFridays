@@ -181,12 +181,10 @@ class FilterByRating(MethodView):
         check_val = db.session.query(
             db.session.query(Review).filter_by(rating=user_rating_rquest).exists()
         ).scalar()
-        print(check_val)
         if check_val == False:
             void = 'no match found'
             return render_template('viewReview.html', void=void)
         get_ratings = db.session.query(Review).filter_by(rating=user_rating_rquest).all()
-        print(get_ratings)
         return render_template('viewReview.html', get_ratings=get_ratings)
 
 # filter by door number
@@ -196,24 +194,26 @@ class FilterByDoorNumber(MethodView):
         check_val = db.session.query(
             db.session.query(Building).filter_by(door_num=user_door_request).exists()
         ).scalar()
-        print(check_val)
         if check_val == False:
             void = 'no match found'
             return render_template('viewReview.html', void=void)
         user_door_request = str(user_door_request)
-        all_reviews = Review.query.all()
-        return render_template('viewReview.html', all_reviews=all_reviews, user_door_request=user_door_request)
+        filter_door = Review.query.all()
+        return render_template('viewReview.html', filter_door=filter_door, user_door_request=user_door_request)
 
 # filter street name
 class FilterByStreetName(MethodView):
     def post(self):
         user_street_request = request.form['searchStreetName']
-        find_street = db.session.query(Review, Building).join(Building).all()
-        for review, address in find_street:
-            if user_street_request != address.street:
-                void = 'No match found.'
-                return render_template('viewReview.html', void=void)
-            return render_template('viewReview.html', find_street=find_street)
+        check_val = db.session.query(
+            db.session.query(Building).filter_by(street=user_street_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = 'no match found'
+            return render_template('viewReview.html', void=void)
+        filter_street = Review.query.all()
+        return render_template('viewReview.html', user_street_request=user_street_request, filter_street=filter_street)
+        
 
 # filter town
 class FilterByTown(MethodView):

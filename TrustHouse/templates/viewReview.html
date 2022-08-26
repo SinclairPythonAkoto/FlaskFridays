@@ -117,10 +117,37 @@ Search Reviews
 {% endif %}
 
 
-{% if all_reviews %}
+{% if filter_door %}
 <h3>All Reviews:</h3>
-{% for review in all_reviews %}
+{% for review in filter_door %}
 {% if user_door_request == review.building.door_num %}
+<h5>Review:</h5>
+<p>
+    {{ review.review }} <br>
+    <b>Rating: {{ review.rating }}</b>
+</p>
+<p><i>Reviewed By: </i>{{ review.reviewed_by }}</p>
+<p><i>Date: </i>{{ review.date }}</p>
+<h5>Address:</h5>
+<p>
+    {{ review.building.door_num }}, {{ review.building.street }}, 
+    {% if review.building.town %}
+    {{ review.building.town }}, 
+    {% endif %}
+    {% if review.building.city %}
+    {{ review.building.city }}, 
+    {% endif %}
+    {{ review.building.postcode }}
+</p>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if filter_street %}
+<h3>All Reviews:</h3>
+{% for review in filter_street %}
+{% if user_street_request == review.building.street %}
 <h5>Review:</h5>
 <p>
     {{ review.review }} <br>

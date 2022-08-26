@@ -10,6 +10,7 @@ Create a Review
     Welcome to <b>Trust House</b>.
     Please complete the form below to write a review. 
 </p>
+<a href="{{ url_for('display_reviews') }}">View Reviews</a>
 <h3>Write Review</h3>
 <form action="{{ url_for('homepage') }}" method="post" enctype="multipart/form-data">
     <label for="reviewContent">Review:</label><br>

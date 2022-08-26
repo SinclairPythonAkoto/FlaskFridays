@@ -87,6 +87,10 @@ class Review(db.Model):
     @cached_property
     def get_town(self):
         return self.building.town
+    
+    @cached_property
+    def get_city(self):
+        return self.building.city
 
 # homepage to write a new review
 class Home(MethodView):
@@ -219,27 +223,41 @@ class FilterByStreetName(MethodView):
 class FilterByTown(MethodView):
     def post(self):
         user_town_request = request.form['searchTown']
-        find_town = db.session.query(Review, Building).join(Building).all()
-        gettown = ''
-        # get_town = Review.query.filter_by(Review.get_town==user_town_request).all()
-        print(gettown)
-        return 'some page'
-        # for review, address in find_town:
-        #     print(address.town)
-        #     if user_town_request != address.town:
-        #         void = 'No match found.'
-        #         return render_template('viewReview.html', void=void)
-        #     return render_template('viewReview.html', find_town=find_town)
+        check_val = db.session.query(
+            db.session.query(Building).filter_by(town=user_town_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = 'no match found'
+            return render_template('viewReview.html', void=void)
+        filter_town = Review.query.all()
+        return render_template('viewReview.html', user_town_request=user_town_request, filter_town=filter_town)
+
 
 # filter city
 class FilterByCity(MethodView):
     def post(self):
-        return 'filter by city'
+        user_city_request = request.form['searchCity']
+        check_val = db.session.query(
+            db.session.query(Building).filter_by(city=user_city_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = 'no match found'
+            return render_template('viewReview.html', void=void)
+        filter_city = Review.query.all()
+        return render_template('viewReview.html', user_city_request=user_city_request, filter_city=filter_city)
 
 # filter postcode
 class FilterByPostcode(MethodView):
     def post(self):
-        return 'filter by postcode'
+        user_postcode_request = request.form['searchPostcode']
+        check_val = db.session.query(
+            db.session.query(Building).filter_by(postcode=user_postcode_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = 'no match found'
+            return render_template('viewReview.html', void=void)
+        filter_postcode = Review.query.all()
+        return render_template('viewReview.html', user_postcode_request=user_postcode_request, filter_postcode=filter_postcode)
 
 # display all towns listed
 class DisplayAllTowns(MethodView):

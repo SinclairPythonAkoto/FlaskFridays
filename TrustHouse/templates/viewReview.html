@@ -171,4 +171,84 @@ Search Reviews
 {% endif %}
 
 
+{% if filter_town %}
+<h3>All Reviews:</h3>
+{% for review in filter_town %}
+{% if user_town_request == review.building.town %}
+<h5>Review:</h5>
+<p>
+    {{ review.review }} <br>
+    <b>Rating: {{ review.rating }}</b>
+</p>
+<p><i>Reviewed By: </i>{{ review.reviewed_by }}</p>
+<p><i>Date: </i>{{ review.date }}</p>
+<h5>Address:</h5>
+<p>
+    {{ review.building.door_num }}, {{ review.building.street }}, 
+    {% if review.building.town %}
+    {{ review.building.town }}, 
+    {% endif %}
+    {% if review.building.city %}
+    {{ review.building.city }}, 
+    {% endif %}
+    {{ review.building.postcode }}
+</p>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if filter_city %}
+<h3>All Reviews:</h3>
+{% for review in filter_city %}
+{% if user_city_request == review.building.city %}
+<h5>Review:</h5>
+<p>
+    {{ review.review }} <br>
+    <b>Rating: {{ review.rating }}</b>
+</p>
+<p><i>Reviewed By: </i>{{ review.reviewed_by }}</p>
+<p><i>Date: </i>{{ review.date }}</p>
+<h5>Address:</h5>
+<p>
+    {{ review.building.door_num }}, {{ review.building.street }}, 
+    {% if review.building.town %}
+    {{ review.building.town }}, 
+    {% endif %}
+    {% if review.building.city %}
+    {{ review.building.city }}, 
+    {% endif %}
+    {{ review.building.postcode }}
+</p>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if filter_postcode %}
+<h3>All Reviews:</h3>
+{% for review in filter_postcode %}
+{% if user_postcode_request == review.building.postcode %}
+<h5>Review:</h5>
+<p>
+    {{ review.review }} <br>
+    <b>Rating: {{ review.rating }}</b>
+</p>
+<p><i>Reviewed By: </i>{{ review.reviewed_by }}</p>
+<p><i>Date: </i>{{ review.date }}</p>
+<h5>Address:</h5>
+<p>
+    {{ review.building.door_num }}, {{ review.building.street }}, 
+    {% if review.building.town %}
+    {{ review.building.town }}, 
+    {% endif %}
+    {% if review.building.city %}
+    {{ review.building.city }}, 
+    {% endif %}
+    {{ review.building.postcode }}
+</p>
+{% endif %}
+{% endfor %}
+{% endif %}
+
 {% endblock %}

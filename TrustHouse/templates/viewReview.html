@@ -16,6 +16,13 @@ Search Reviews
 <form action="{{ url_for('all_reviews') }}" method="post">
     <button type="submit">All Reviews</button>
 </form>
+<form action="{{ url_for('listed_towns') }}" method="post">
+    <button type="submit">Listed Towns</button>
+</form>
+<form action="{{ url_for('listed_cities') }}" method="post">
+    <button type="submit">Listed Cities</button>
+</form>
+<br>
 <br>
 <form action="{{ url_for('filter_rating') }}" method="post">
     <label for="searchRating">Search by Review Rating: </label>
@@ -52,14 +59,7 @@ Search Reviews
     <input type="text" name="searchPostcode" id="searchPostcode" placeholder="Enter a street name" required>
     <button type="submit">Find Reviews</button>
 </form>
-<br><br>
-<form action="{{ url_for('listed_towns') }}" method="post">
-    <button type="submit">Listed Towns</button>
-</form>
 <br>
-<form action="{{ url_for('listed_cities') }}" method="post">
-    <button type="submit">Listed Towns</button>
-</form>
 <br>
 
 {% if void %}
@@ -88,6 +88,22 @@ Search Reviews
     {% endif %}
     {{ review.building.postcode }}
 </p>
+{% endfor %}
+{% endif %}
+
+
+{% if listed_towns %}
+<h3>Listed Towns:</h3>
+{% for address in listed_towns %}
+<p>{{ address.town }}</p>
+{% endfor %}
+{% endif %}
+
+
+{% if listed_cities %}
+<h3>Listed Cities:</h3>
+{% for address in listed_cities %}
+<p>{{ address.city }}</p>
 {% endfor %}
 {% endif %}
 

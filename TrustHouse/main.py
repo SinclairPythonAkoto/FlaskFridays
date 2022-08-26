@@ -84,13 +84,10 @@ class Review(db.Model):
     date = db.Column(db.DateTime, nullable=False)
     building_id = db.Column(db.Integer, db.ForeignKey('building.id'))
 
-    @cached_property
-    def get_town(self):
-        return self.building.town
+    # @cached_property
+    # def get_town(self):
+    #     return self.building.town
     
-    @cached_property
-    def get_city(self):
-        return self.building.city
 
 # homepage to write a new review
 class Home(MethodView):
@@ -177,6 +174,21 @@ class DisplayAllReviews(MethodView):
         get_reviews = Review.query.all()
         return render_template('viewReview.html', get_reviews=get_reviews)
 
+
+# display all towns listed
+class DisplayAllTowns(MethodView):
+    def post(self):
+        listed_towns = Building.query.all()
+        return render_template('viewREview.html', listed_towns=listed_towns)
+
+
+# display all cities listed
+class DisplayAllCites(MethodView):
+    def post(self):
+        listed_cities = Building.query.all()
+        return render_template('viewReview.html', listed_cities=listed_cities)
+
+
 # filter by review rating
 class FilterByRating(MethodView):
     def post(self):
@@ -190,6 +202,7 @@ class FilterByRating(MethodView):
             return render_template('viewReview.html', void=void)
         get_ratings = db.session.query(Review).filter_by(rating=user_rating_rquest).all()
         return render_template('viewReview.html', get_ratings=get_ratings)
+
 
 # filter by door number
 class FilterByDoorNumber(MethodView):
@@ -259,29 +272,19 @@ class FilterByPostcode(MethodView):
         filter_postcode = Review.query.all()
         return render_template('viewReview.html', user_postcode_request=user_postcode_request, filter_postcode=filter_postcode)
 
-# display all towns listed
-class DisplayAllTowns(MethodView):
-    def post(self):
-        return 'display all towns listed'
-
-# display all cities listed
-class DisplayAllCites(MethodView):
-    def post(self):
-        return 'display all cities'
-
 
 # define web route from class routes 
 app.add_url_rule('/', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/reviews', view_func=DisplayReviews.as_view(name='display_reviews'))
 app.add_url_rule('/reviews/all', view_func=DisplayAllReviews.as_view(name='all_reviews'))
+app.add_url_rule('/reviews/listed-towns', view_func=DisplayAllTowns.as_view(name='listed_towns'))
+app.add_url_rule('/reviews/listed-cities', view_func=DisplayAllCites.as_view(name='listed_cities'))
 app.add_url_rule('/reviews/rating', view_func=FilterByRating.as_view(name='filter_rating'))
 app.add_url_rule('/reviews/door_number', view_func=FilterByDoorNumber.as_view(name='filter_door_num'))
 app.add_url_rule('/reviews/street', view_func=FilterByStreetName.as_view(name='filter_street'))
 app.add_url_rule('/reviews/town', view_func=FilterByTown.as_view(name='filter_town'))
 app.add_url_rule('/reviews/city', view_func=FilterByCity.as_view(name='filter_city'))
 app.add_url_rule('/reviews/postcode', view_func=FilterByPostcode.as_view(name='filter_postcode'))
-app.add_url_rule('/reviews/listed-towns', view_func=DisplayAllTowns.as_view(name='listed_towns'))
-app.add_url_rule('/reviews/listed-cities', view_func=DisplayAllCites.as_view(name='listed_cities'))
 
 
 if '__main__' == __name__:

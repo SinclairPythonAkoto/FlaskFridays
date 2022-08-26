@@ -120,10 +120,7 @@ class Home(MethodView):
         get_door_number = Building.query.filter_by(door_num=door).all()
         get_postcode = Building.query.filter_by(postcode=review_postcode).all()
         get_review_conent = Review.query.filter_by(review=review_content).all()
-        print(len(get_postcode))
-        # rearrange try block --> if statement, if len poscode is 0 then create a new entry
-        # else, 
-        # if door & poscode match, and there is a duplicate warn the user, else add new review to existing address
+        
         if len(get_postcode) == 0:
             new_address = Building(
                 door_num=door,
@@ -160,7 +157,7 @@ class Home(MethodView):
                 )
                 db.session.add(new_review)
                 db.session.commit()
-                message = f'A new review has been added to: {get_postcode[0].door_num}, {get_postcode[0].street}'
+                message = f'A new review has been added to: {get_postcode}, {get_postcode}'
                 return message
             
             
@@ -522,7 +519,47 @@ class FilterByPostcodeAPI(MethodView):
                 }
                 res.append(result)
         data = {'search by postcode': res}
-        return jsonify(data)                
+        return jsonify(data)
+
+
+class CreateAddressAPI(MethodView):
+    def get(self):
+        return render_template('createAddress.html')
+
+    def post(self):
+        door = request.form['doorNumber']
+        street = request.form['streetName']
+        town = request.form['townName']
+        city = request.form['cityName']
+        address_postcode = request.form['addressPostcode']
+
+        # get data from the db to check if they already exist
+        get_door_number = Building.query.filter_by(door_num=door).all()
+        get_postcode = Building.query.filter_by(postcode=address_postcode).all()
+        get_review_conent = Review.query.all()
+        
+        if len(get_postcode) == 0:
+            new_address = Building(
+                door_num=door,
+                street=street,
+                town=town,
+                city=city,
+                postcode=address_postcode,
+            )
+            db.session.add(new_address)
+            db.session.commit()
+            message = 'Your review has been uploaded!'
+            return message
+        else:    
+            if door == get_door_number[0].door_num and address_postcode == get_postcode[0].postcode:
+                # need to use a try block to check if the review content is not a duplicate
+                if len(get_review_conent) != 0:
+                    message = 'DUPLICATE ADDRESS: please check & change the address'
+                    return message
+                message = f'A new review has been added to: {get_postcode}, {get_postcode}'
+                return message
+            
+
 
 
 # define web route from class routes 
@@ -537,7 +574,7 @@ app.add_url_rule('/reviews/street', view_func=FilterByStreetName.as_view(name='f
 app.add_url_rule('/reviews/town', view_func=FilterByTown.as_view(name='filter_town'))
 app.add_url_rule('/reviews/city', view_func=FilterByCity.as_view(name='filter_city'))
 app.add_url_rule('/reviews/postcode', view_func=FilterByPostcode.as_view(name='filter_postcode'))
-# API routes:
+# (get) API routes:
 app.add_url_rule('/API/address', view_func=AllAddressesAPI.as_view(name='address_API'))
 app.add_url_rule('/API/reviews', view_func=AllReviewsAPI.as_view(name='review_API'))
 app.add_url_rule('/API/rating/<rating>', view_func=FilterByRatingAPI.as_view(name='filter_by_rating_API'))
@@ -546,6 +583,8 @@ app.add_url_rule('/API/street/<street>', view_func=FilterByStreetAPI.as_view(nam
 app.add_url_rule('/API/town/<town>', view_func=FilterByTownAPI.as_view(name='filter_by_town_API'))
 app.add_url_rule('/API/city/<city>', view_func=FilterByCityAPI.as_view(name='filter_by_city_API'))
 app.add_url_rule('/API/postcode/<postcode>', view_func=FilterByPostcodeAPI.as_view(name='filter_by_postcode_API'))
+# (post) API route:
+app.add_url_rule('/API/create/address', view_func=CreateAddressAPI.as_view(name='create_address_API'))
 
 
 if '__main__' == __name__:

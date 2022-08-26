@@ -334,6 +334,36 @@ class AllReviewsAPI(MethodView):
         return jsonify(data)
 
 
+class FilterByRatingAPI(MethodView):
+    def get(self, rating):
+        user_rating_rquest = int(rating)
+        check_val = db.session.query(
+            db.session.query(Review).filter_by(rating=user_rating_rquest).exists()
+        ).scalar()
+        if check_val == False:
+            void = {'void': 'no match found'}
+            return jsonify(void)
+        res = []
+        get_ratings = db.session.query(Review).filter_by(rating=user_rating_rquest).all()
+        for review in get_ratings:
+            result = {
+                'id': review.id,
+                'Rating': review.rating,
+                'Review': review.review,
+                'Reviewed By': review.reviewed_by,
+                'Date': review.date,
+                'Building ID': review.building_id,
+                'Address': {
+                    'id': review.building.id,
+                    'Door Number': review.building.door_num,
+                    'Street': review.building.street,
+                    'Postode': review.building.postcode,
+                },
+            }
+            res.append(result)
+        data = {'reviews by rating': res}
+        return jsonify(data)
+
 
 # define web route from class routes 
 app.add_url_rule('/', view_func=Home.as_view(name='homepage'))
@@ -350,7 +380,7 @@ app.add_url_rule('/reviews/postcode', view_func=FilterByPostcode.as_view(name='f
 # API routes:
 app.add_url_rule('/API/address', view_func=AllAddressesAPI.as_view(name='address_API'))
 app.add_url_rule('/API/reviews', view_func=AllReviewsAPI.as_view(name='review_API'))
-
+app.add_url_rule('/API/rating/<rating>', view_func=FilterByRatingAPI.as_view(name='filter_by_rating_API'))
 
 if '__main__' == __name__:
     db.create_all()

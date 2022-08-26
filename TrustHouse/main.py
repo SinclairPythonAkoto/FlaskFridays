@@ -1,5 +1,5 @@
 from functools import cached_property
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, jsonify
 from flask.views import View, MethodView
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -273,6 +273,44 @@ class FilterByPostcode(MethodView):
         return render_template('viewReview.html', user_postcode_request=user_postcode_request, filter_postcode=filter_postcode)
 
 
+'''
+Create the API calls for the user, to enable them to query reviews and get results from the browser.
+
+- get all address
+- get all reviews
+
+- filter by specfic rating -> API/rating/<...>
+- filter by door number --> API/door/<...>
+- filter by street name --> API/street/<...>
+- filter by town name --> API/town/<...>
+- filter by city name --> API/city/<...>
+- filter by postcode name --> API/postcode/<...>
+'''
+
+# @app.route('/API/address')
+# def address_API():
+#     return 'hello world'
+
+class AllAddressesAPI(MethodView):
+    def get(self):
+        all_addresses = Building.query.all()
+        print(len(all_addresses))
+        res = []
+        for x in all_addresses:
+            result = {
+                'id': x.id,
+                'Door Number': x.door_num,
+                'Street': x.street,
+                'Town': x.town,
+                'City': x.city,
+                'Postcode': x.postcode
+            }
+            res.append(result)
+        return jsonify(res)
+
+
+
+
 # define web route from class routes 
 app.add_url_rule('/', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/reviews', view_func=DisplayReviews.as_view(name='display_reviews'))
@@ -285,6 +323,8 @@ app.add_url_rule('/reviews/street', view_func=FilterByStreetName.as_view(name='f
 app.add_url_rule('/reviews/town', view_func=FilterByTown.as_view(name='filter_town'))
 app.add_url_rule('/reviews/city', view_func=FilterByCity.as_view(name='filter_city'))
 app.add_url_rule('/reviews/postcode', view_func=FilterByPostcode.as_view(name='filter_postcode'))
+# API routes:
+app.add_url_rule('/API/address', view_func=AllAddressesAPI.as_view(name='address_API'))
 
 
 if '__main__' == __name__:

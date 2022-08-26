@@ -306,7 +306,8 @@ class AllAddressesAPI(MethodView):
                 'Postcode': x.postcode
             }
             res.append(result)
-        return jsonify(res)
+        data = {'all addresses': res}
+        return jsonify(data)
 
 
 

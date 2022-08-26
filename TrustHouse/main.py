@@ -1,4 +1,5 @@
 from functools import cached_property
+from re import L
 from flask import Flask, render_template, url_for, request, jsonify
 from flask.views import View, MethodView
 from flask_sqlalchemy import SQLAlchemy
@@ -424,8 +425,104 @@ class FilterByStreetAPI(MethodView):
                     },
                 }
                 res.append(result)
-        data = {'search by door number': res}
+        data = {'search by street': res}
         return jsonify(data)
+
+
+class FilterByTownAPI(MethodView):
+    def get(self, town):
+        user_town_request = town
+        check_val = db.session.query(
+            db.session.query(Building).filter_by(town=user_town_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = {'void': 'no match found'}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        for review in get_reviews:
+            if user_town_request == review.building.town:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Reviewed By': review.reviewed_by,
+                    'Date': review.date,
+                    'Building ID': review.building_id,
+                    'Address': {
+                        'id': review.building.id,
+                        'Door Number': review.building.street,
+                        'Street': review.building.street,
+                        'Postode': review.building.postcode,
+                    },
+                }
+                res.append(result)
+        data = {'search by town': res}
+        return jsonify(data)
+
+
+class FilterByCityAPI(MethodView):
+    def get(self, city):
+        user_city_request = city
+        check_val = db.session.query(
+            db.session.query(Building).filter_by(city=user_city_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = {'void': 'no match found'}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        for review in get_reviews:
+            if user_city_request == review.building.city:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Reviewed By': review.reviewed_by,
+                    'Date': review.date,
+                    'Building ID': review.building_id,
+                    'Address': {
+                        'id': review.building.id,
+                        'Door Number': review.building.street,
+                        'Street': review.building.street,
+                        'Postode': review.building.postcode,
+                    },
+                }
+                res.append(result)
+        data = {'search by city': res}
+        return jsonify(data)
+
+
+class FilterByPostcodeAPI(MethodView):
+    def get(self, postcode):
+        user_postcode_request = postcode
+        check_val = db.session.query(
+            db.session.query(Building).filter_by(postcode=user_postcode_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = {'void': 'no match found'}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        for review in get_reviews:
+            if user_postcode_request == review.building.postcode:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Reviewed By': review.reviewed_by,
+                    'Date': review.date,
+                    'Building ID': review.building_id,
+                    'Address': {
+                        'id': review.building.id,
+                        'Door Number': review.building.street,
+                        'Street': review.building.street,
+                        'Postode': review.building.postcode,
+                    },
+                }
+                res.append(result)
+        data = {'search by postcode': res}
+        return jsonify(data)                
 
 
 # define web route from class routes 
@@ -445,7 +542,11 @@ app.add_url_rule('/API/address', view_func=AllAddressesAPI.as_view(name='address
 app.add_url_rule('/API/reviews', view_func=AllReviewsAPI.as_view(name='review_API'))
 app.add_url_rule('/API/rating/<rating>', view_func=FilterByRatingAPI.as_view(name='filter_by_rating_API'))
 app.add_url_rule('/API/door/<door_num>', view_func=FilterByDoorAPI.as_view(name='filter_by_door_API'))
-app.add_url_rule('/API/street/<street>', view_func=FilterByStreetAPI.as_view(name='filter_by_street_API'))
+app.add_url_rule('/API/street/<street>', view_func=FilterByStreetAPI.as_view(name='filtesr_by_street_API'))
+app.add_url_rule('/API/town/<town>', view_func=FilterByTownAPI.as_view(name='filter_by_town_API'))
+app.add_url_rule('/API/city/<city>', view_func=FilterByCityAPI.as_view(name='filter_by_city_API'))
+app.add_url_rule('/API/postcode/<postcode>', view_func=FilterByPostcodeAPI.as_view(name='filter_by_postcode_API'))
+
 
 if '__main__' == __name__:
     db.create_all()

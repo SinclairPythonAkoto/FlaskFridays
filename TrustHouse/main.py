@@ -294,21 +294,44 @@ Create the API calls for the user, to enable them to query reviews and get resul
 class AllAddressesAPI(MethodView):
     def get(self):
         all_addresses = Building.query.all()
-        print(len(all_addresses))
         res = []
-        for x in all_addresses:
+        for address in all_addresses:
             result = {
-                'id': x.id,
-                'Door Number': x.door_num,
-                'Street': x.street,
-                'Town': x.town,
-                'City': x.city,
-                'Postcode': x.postcode
+                'id': address.id,
+                'Door Number': address.door_num,
+                'Street': address.street,
+                'Town': address.town,
+                'City': address.city,
+                'Postcode': address.postcode
             }
             res.append(result)
         data = {'all addresses': res}
         return jsonify(data)
 
+
+class AllReviewsAPI(MethodView):
+    def get(self):
+        all_reviews = Review.query.all()
+        res = []
+        print(all_reviews)
+        for review in all_reviews:
+            result = {
+                'id': review.id,
+                'Rating': review.rating,
+                'Review': review.review,
+                'Reviewed By': review.reviewed_by,
+                'Date': review.date,
+                'Building ID': review.building_id,
+                'Address': {
+                    'id': review.building.id,
+                    'Door Number': review.building.door_num,
+                    'Street': review.building.street,
+                    'Postode': review.building.postcode,
+                },
+            }
+            res.append(result)
+        data = {'all reviews': res}
+        return jsonify(data)
 
 
 
@@ -326,6 +349,7 @@ app.add_url_rule('/reviews/city', view_func=FilterByCity.as_view(name='filter_ci
 app.add_url_rule('/reviews/postcode', view_func=FilterByPostcode.as_view(name='filter_postcode'))
 # API routes:
 app.add_url_rule('/API/address', view_func=AllAddressesAPI.as_view(name='address_API'))
+app.add_url_rule('/API/reviews', view_func=AllReviewsAPI.as_view(name='review_API'))
 
 
 if '__main__' == __name__:

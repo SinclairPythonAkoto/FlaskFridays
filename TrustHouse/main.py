@@ -214,7 +214,6 @@ class FilterByDoorNumber(MethodView):
         if check_val == False:
             void = 'no match found'
             return render_template('viewReview.html', void=void)
-        user_door_request = str(user_door_request)
         filter_door = Review.query.all()
         return render_template('viewReview.html', filter_door=filter_door, user_door_request=user_door_request)
 
@@ -365,6 +364,38 @@ class FilterByRatingAPI(MethodView):
         return jsonify(data)
 
 
+class FilterByDoorAPI(MethodView):
+    def get(self, door_num):
+        user_door_request = door_num
+        check_val = db.session.query(
+            db.session.query(Building).filter_by(door_num=user_door_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = {'void': 'no match found'}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        for review in get_reviews:
+            if user_door_request == review.building.door_num:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Reviewed By': review.reviewed_by,
+                    'Date': review.date,
+                    'Building ID': review.building_id,
+                    'Address': {
+                        'id': review.building.id,
+                        'Door Number': review.building.door_num,
+                        'Street': review.building.street,
+                        'Postode': review.building.postcode,
+                    },
+                }
+                res.append(result)
+        data = {'search by door number': res}
+        return jsonify(data)
+
+
 # define web route from class routes 
 app.add_url_rule('/', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/reviews', view_func=DisplayReviews.as_view(name='display_reviews'))
@@ -381,6 +412,7 @@ app.add_url_rule('/reviews/postcode', view_func=FilterByPostcode.as_view(name='f
 app.add_url_rule('/API/address', view_func=AllAddressesAPI.as_view(name='address_API'))
 app.add_url_rule('/API/reviews', view_func=AllReviewsAPI.as_view(name='review_API'))
 app.add_url_rule('/API/rating/<rating>', view_func=FilterByRatingAPI.as_view(name='filter_by_rating_API'))
+app.add_url_rule('/API/door/<door_num>', view_func=FilterByDoorAPI.as_view(name='filter_by_door_API'))
 
 if '__main__' == __name__:
     db.create_all()

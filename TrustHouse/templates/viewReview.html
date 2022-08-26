@@ -66,11 +66,15 @@ Search Reviews
 {{ void }}
 {% endif %}
 
+
 {% if get_reviews %}
 <h3>All Reviews:</h3>
 {% for review in get_reviews %}
 <h5>Review:</h5>
-<p>{{ review.review }}</p>
+<p>
+    {{ review.review }} <br>
+    <b>Rating: {{ review.rating }}</b>
+</p>
 <p><i>Reviewed By: </i>{{ review.reviewed_by }}</p>
 <p><i>Date: </i>{{ review.date }}</p>
 <h5>Address:</h5>
@@ -87,11 +91,15 @@ Search Reviews
 {% endfor %}
 {% endif %}
 
-{% if find_rating %}
+
+{% if get_ratings %}
 <h3>All Reviews:</h3>
-{% for review in find_rating %}
+{% for review in get_ratings %}
 <h5>Review:</h5>
-<p>{{ review.review }}</p>
+<p>
+    {{ review.review }} <br>
+    <b>Rating: {{ review.rating }}</b>
+</p>
 <p><i>Reviewed By: </i>{{ review.reviewed_by }}</p>
 <p><i>Date: </i>{{ review.date }}</p>
 <h5>Address:</h5>
@@ -108,42 +116,32 @@ Search Reviews
 {% endfor %}
 {% endif %}
 
-{% for review, address in find_door %}
-<h3>All Reviews:</h3>
-<h5>Review:</h5>
-<p>{{ review.review }}</p>
-<p><i>Reviewed By: </i>{{ review.reviewed_by }}</p>
-<p><i>Date: </i>{{ review.date }}</p>
-<h5>Address:</h5>
-<p>
-    {{ address.door_num }}, {{ address.street }}, 
-    {% if address.town %}
-    {{ address.town }}, 
-    {% endif %}
-    {% if address.city %}
-    {{ address.city }}, 
-    {% endif %}
-    {{ address.postcode }}
-</p>
-{% endfor %}
 
-{% for review, address in find_street %}
+{% if all_reviews %}
 <h3>All Reviews:</h3>
+{% for review in all_reviews %}
+{% if user_door_request == review.building.door_num %}
 <h5>Review:</h5>
-<p>{{ review.review }}</p>
+<p>
+    {{ review.review }} <br>
+    <b>Rating: {{ review.rating }}</b>
+</p>
 <p><i>Reviewed By: </i>{{ review.reviewed_by }}</p>
 <p><i>Date: </i>{{ review.date }}</p>
 <h5>Address:</h5>
 <p>
-    {{ address.door_num }}, {{ address.street }}, 
-    {% if address.town %}
-    {{ address.town }}, 
+    {{ review.building.door_num }}, {{ review.building.street }}, 
+    {% if review.building.town %}
+    {{ review.building.town }}, 
     {% endif %}
-    {% if address.city %}
-    {{ address.city }}, 
+    {% if review.building.city %}
+    {{ review.building.city }}, 
     {% endif %}
-    {{ address.postcode }}
+    {{ review.building.postcode }}
 </p>
+{% endif %}
 {% endfor %}
+{% endif %}
+
 
 {% endblock %}

@@ -1,3 +1,4 @@
+from functools import cached_property
 from flask import Flask, render_template, url_for, request, redirect
 from flask.views import View, MethodView
 from flask_sqlalchemy import SQLAlchemy
@@ -82,6 +83,10 @@ class Review(db.Model):
     rendered_pic = db.Column(db.Text)
     date = db.Column(db.DateTime, nullable=False)
     building_id = db.Column(db.Integer, db.ForeignKey('building.id'))
+
+    @cached_property
+    def get_town(self):
+        return self.building.town
 
 # homepage to write a new review
 class Home(MethodView):
@@ -171,35 +176,41 @@ class DisplayAllReviews(MethodView):
 # filter by review rating
 class FilterByRating(MethodView):
     def post(self):
-        user_rating_input = request.form['searchRating']
-        user_rating_input = int(user_rating_input)
-        find_rating = Review.query.filter_by(rating=user_rating_input).all()
-        if find_rating[0].rating != user_rating_input:
+        user_rating_rquest = request.form['searchRating']
+        user_rating_rquest = int(user_rating_rquest)
+        check_val = db.session.query(
+            db.session.query(Review).filter_by(rating=user_rating_rquest).exists()
+        ).scalar()
+        print(check_val)
+        if check_val == False:
             void = 'no match found'
-            return void
-        return render_template('viewReview.html', find_rating=find_rating)
+            return render_template('viewReview.html', void=void)
+        get_ratings = db.session.query(Review).filter_by(rating=user_rating_rquest).all()
+        print(get_ratings)
+        return render_template('viewReview.html', get_ratings=get_ratings)
 
 # filter by door number
 class FilterByDoorNumber(MethodView):
     def post(self):
-        user_door_input = request.form['searchDoorNumber']
-        find_door = db.session.query(Review, Building).join(Building).all()
-        for review, address in find_door:
-            if address.door_num != user_door_input:
-                void = 'no match found'
-                return render_template('viewReview.html', void=void)
-            return render_template(
-                'viewReview.html',
-                find_door=find_door,
-            )
+        user_door_request = request.form['searchDoorNumber']
+        check_val = db.session.query(
+            db.session.query(Building).filter_by(door_num=user_door_request).exists()
+        ).scalar()
+        print(check_val)
+        if check_val == False:
+            void = 'no match found'
+            return render_template('viewReview.html', void=void)
+        user_door_request = str(user_door_request)
+        all_reviews = Review.query.all()
+        return render_template('viewReview.html', all_reviews=all_reviews, user_door_request=user_door_request)
 
 # filter street name
 class FilterByStreetName(MethodView):
     def post(self):
-        user_street_input = request.form['searchStreetName']
+        user_street_request = request.form['searchStreetName']
         find_street = db.session.query(Review, Building).join(Building).all()
         for review, address in find_street:
-            if user_street_input != address.street:
+            if user_street_request != address.street:
                 void = 'No match found.'
                 return render_template('viewReview.html', void=void)
             return render_template('viewReview.html', find_street=find_street)
@@ -207,7 +218,18 @@ class FilterByStreetName(MethodView):
 # filter town
 class FilterByTown(MethodView):
     def post(self):
-        return 'filter by town'
+        user_town_request = request.form['searchTown']
+        find_town = db.session.query(Review, Building).join(Building).all()
+        gettown = ''
+        # get_town = Review.query.filter_by(Review.get_town==user_town_request).all()
+        print(gettown)
+        return 'some page'
+        # for review, address in find_town:
+        #     print(address.town)
+        #     if user_town_request != address.town:
+        #         void = 'No match found.'
+        #         return render_template('viewReview.html', void=void)
+        #     return render_template('viewReview.html', find_town=find_town)
 
 # filter city
 class FilterByCity(MethodView):

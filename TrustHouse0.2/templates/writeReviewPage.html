@@ -15,7 +15,7 @@
     <h1>Write A Review</h1>
     <!-- Create a review form -->
     <div class="bg-img">
-        <form action="/" class="container">
+        <form action="{{ url_for('write_review') }}" class="container" method="post">
          <h1 class="disableBlur">Address</h1>
 	    <label for="propertyNumber">Door / Property Number</label>
 	    <input type="text" placeholder="Enter Door/Property Number" name="propertyNumber" style="width:89%" required/><br>

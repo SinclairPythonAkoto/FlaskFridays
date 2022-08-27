@@ -19,7 +19,7 @@ class Building(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     door_num = db.Column(db.String(35), nullable=False)
     street = db.Column(db.String(60), nullable=False)
-    residence = db.Column(db.String(50))
+    location = db.Column(db.String(50))
     postcode = db.Column(db.String(10), nullable=False)
     reviews = db.relationship('Review', backref='building')
 
@@ -38,19 +38,63 @@ class Review(db.Model):
 def landingpage():
     return render_template("landingPage.html")
 
+class Home(MethodView):
+    def get(self):
+        return render_template('homepage.html')
+    
+class WriteReview(MethodView):
+    def get(self):
+        return render_template('writeReviewPage.html')
+    
+    def post(self):
+        # address data
+        door = request.form['propertyNumber']
+        street_name = request.form['streetName']
+        town_city = request.form['town_city']
+        postcode = request.form['postcode']
+        # review data
+        review_rating = request.form['rating']
+        review_text = request.form['reviewText']
+        review_type = request.form['selection']
+        review_pic = request.form['imgUpload']
 
+        # get data to check if new review already exists
+        get_door_num = Building.query.filter_by(door_num=door).all()
+        get_postcode = Building.query.filter_by(postcode=postcode).all()
+        get_review_content = Review.query.filter_by(review=review_text).all()
 
-@app.route("/homepage")
-def homepage():
-    return render_template("homepage.html")
+        if len(get_postcode) == 0:
+            new_address = Building(
+                door_num=door,
+                street=street_name,
+                location=town_city,
+                postcode=postcode,
+            )
+            db.session.add(new_address)
+            db.session.commit()
+            new_review = Review(
+                rating=review_rating,
+                review=review_text,
+                reviewed_by=review_type,
+                date=datetime.now()
+            )
+            db.session.add(new_review)
+            db.session.commit()
+            message = 'Your review has been uploaded!'
+            return message
+        else:
+            return 'something'
+                
+        return render_template('writeReviewPage.html')
 
-@app.route("/writeReview")
-def writeReview():
-    return render_template('writeReviewPage.html')
 
 @app.route('/viewReviews')
 def view_reviews():
     return render_template('searchReviewPage.html')
+
+
+app.add_url_rule('/home', view_func=Home.as_view(name='homepage'))
+app.add_url_rule('/writeReview', view_func=WriteReview.as_view(name='write_review'))
 
 if __name__ == "__main__":
     app.run(debug=True)

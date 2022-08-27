@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <meta charset="utf-8">
+    <title>Trust House Reviews</title>
+    <meta name="description" content="Web app that enables users to rate the condition and attributes of a property.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/writeReview.css">
+    <script src="https://kit.fontawesome.com/fbfdd5a072.js" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block content %}
+    
+    <div class="bg-img">
+    </div>
+    <form action="/" method="post" class="container">
+        <button type="submit">All Reviews</button>
+    </form>
+    <div>
+    <br><br>
+    <form action="/" method="post" class="container">
+        <button type="submit">Listed Towns</button>
+    </form>
+    <br><br>
+    <form action="/" method="post" class="container">
+        <button type="submit">Listed Cities</button>
+    </form>
+    <br>
+    <h1>Trust House Search Engine</h1>
+    <br>
+    <div >
+    <form action="/" method="post" class="container" style="border-right: 5px solid red;">
+        <label for="searchRating">Find Review by Rating: </label><br>
+        <input type="number" name="searchRating" id="searchRating" placeholder="Enter a rating from 1 - 5" required>
+        <button type="submit">Find Reviews</button>
+    </form>
+    <br><br><br>
+    <form action="/" method="post" class="container" style="border-right: 5px solid red;">
+        <label for="searchDoorNum">Find Review by Door Number: </label><br>
+        <input type="text" name="searchDoorNum" id="searchDoorNum" placeholder="Enter door number" required>
+        <button type="submit">Find Reviews</button>
+    </form>
+    <br><br><br><br><br><br><br>
+    <form action="/" method="post" class="container" style="border-right: 5px solid red;">
+        <label for="searchStreetName">Find Review by Street Name: </label><br>
+        <input type="text" name="searchStreetName" id="searchStreetName" placeholder="Enter street name" required>
+        <button type="submit">Find Reviews</button>
+    </form>
+    <br><br><br><br><br><br><br>
+    <form action="/" method="post" class="container" style="border-right: 5px solid red;">
+        <label for="searchTown">Find Review by Town: </label><br>
+        <input type="text" name="searchTown" id="searchTown" placeholder="Enter town">
+        <button type="submit">Find Reviews</button>
+    </form>
+    <br><br><br><br><br><br><br>
+    <form action="/" method="post" class="container" style="border-right: 5px solid red;">
+        <label for="searchCity">Find Review by City: </label><br>
+        <input type="text" name="searchCity" id="searchCity" placeholder="Enter city">
+        <button type="submit">Find Reviews</button>
+    </form>
+    <br><br><br><br><br><br><br>
+    <form action="/" method="post" class="container" style="border-right: 5px solid red;">
+        <label for="searchPostcode">Find Review by Postcode: </label><br>
+        <input type="text" name="searchPostcode" id="searchPostcode" placeholder="Enter postcode" required>
+        <button type="submit">Find Reviews</button>
+    </form>
+    </div>
+        
+
+        
+{% endblock %}

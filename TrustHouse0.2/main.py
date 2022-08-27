@@ -15,5 +15,9 @@ def homepage():
 def writeReview():
     return render_template('writeReviewPage.html')
 
+@app.route('/viewReviews')
+def view_reviews():
+    return render_template('searchReviewPage.html')
+
 if __name__ == "__main__":
     app.run(debug=True)

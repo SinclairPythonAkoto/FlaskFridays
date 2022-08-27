@@ -70,7 +70,7 @@
       <a href="{{ url_for('homepage') }}" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a> 
       <a href="/homepage#description" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Description</a> 
       <a href="/homepage#factors" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Factors</a> 
-      <a href="/homepage#instructions" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Instructions</a> 
+      <!-- <a href="/homepage#instructions" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Instructions</a>  -->
       <a href="{{ url_for('writeReview') }}" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Write Review</a> 
       <a href="#viewReviews" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">View Reviews</a>
     </div>
@@ -86,5 +86,17 @@
   <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
 
     {% block content %}{% endblock %}
+    <script>
+      // Script to open and close sidebar
+      function w3_open() {
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("myOverlay").style.display = "block";
+      }
+       
+      function w3_close() {
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("myOverlay").style.display = "none";
+      }
+      </script>
 </body>
 </html>

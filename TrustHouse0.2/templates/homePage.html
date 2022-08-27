@@ -11,7 +11,7 @@ House Trust
 <!-- Main page content -->
 <div class="w3-main" style="margin-left:340px;margin-right:40px">
     <div class="w3-container" style="margin-top:80px" id="home">
-    <h1 class="w3-jumbo"><b>Rate This Property!</b></h1>
+    <h1 class="w3-jumbo"><b>Trust House</b></h1>
     <h1 class="w3-large" style="color:red">Making Your Voice Heard In Your Community</hr>
     <hr style="width:50px;border:5px solid red" class="w3-round"/>
 </div>
@@ -202,19 +202,24 @@ House Trust
     </div>
 </div>
 
-<div class="w3-container" style="margin-top:80px" id="instructions">
-    <h1 class="w3-xxlarge"><b>Instructions</b></h1>
-    <hr style="width:50px;border:5px solid red" class="w3-round"/>
-    <p>
-        Creating a review can be done in <b>4 simple steps!</b>
-    </p>
-    <ol>
-        <li>Enter the address.</li>
-    <li>Give the property a rating (out of five)</li>
-    <li>Write your review.</li>
-    <li>Upload your review</li>
-    </ol>
+<br>
+<br>
+<div id="instructions">
+    <div class="w3-container" style="margin-top:80px">
+        <h1 class="w3-xxlarge"><b>Instructions</b></h1>
+        <hr style="width:50px;border:5px solid red" class="w3-round"/>
+        <p>
+            Creating a review can be done in <b>4 simple steps!</b>
+        </p>
+        <ol>
+            <li>Enter the address.</li>
+        <li>Give the property a rating (out of five)</li>
+        <li>Write your review.</li>
+        <li>Upload your review</li>
+        </ol>
 
+    </div>
+    <a href="{{ url_for('writeReview') }}" style="color: red;">Write a review</a>
 </div>
 </div>
 

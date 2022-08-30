@@ -1,3 +1,4 @@
+from inspect import _void
 from flask import Flask 
 from flask import render_template, url_for, request, jsonify
 from flask.views import View, MethodView
@@ -197,6 +198,21 @@ class FilterByStreetName(MethodView):
             filter_street=filter_street,
         )
 
+class FilterByLocation(MethodView):
+    def post(self):
+        user_location_request = request.form['searchLocation']
+        check_request = db.session.query(
+            db.session.query(Address).filter_by(location=user_location_request).exists()
+        ).scalar()
+        if check_request == False:
+            void = 'No match found.'
+            return render_template('searchReviewPage.html', void=void)
+        filter_location = Review.query.all()
+        return render_template(
+            'searchReviewPage.html',
+            user_location_request=user_location_request,
+            filter_location=filter_location,
+        )
 
 app.add_url_rule('/home', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/writeReview', view_func=WriteReview.as_view(name='write_review'))
@@ -205,6 +221,7 @@ app.add_url_rule('/reviews/all/locations', view_func=DisplayListedLocations.as_v
 app.add_url_rule('/reviews/rating', view_func=FilterByRating.as_view(name='filter_ratings'))
 app.add_url_rule('/reviews/door_number', view_func=FilterByDoorNumber.as_view(name='filter_door'))
 app.add_url_rule('/reviews/street', view_func=FilterByStreetName.as_view(name='filter_street'))
+app.add_url_rule('/reviews/location', view_func=FilterByLocation.as_view(name='filter_location'))
 
 
 if __name__ == "__main__":

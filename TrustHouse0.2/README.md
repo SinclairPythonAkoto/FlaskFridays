@@ -15,11 +15,11 @@ For this version of the web app I will create the database manually and then cre
 *Open Python in project directory.*
 ```
 from datetime import datetime
-from main import db, Building, Review
+from main import db, Address, Review
 
 db.create_all()
 
-default_address = Building(
+default_address = Address(
     door_num='60',
     street='kingsly street',
     location='London'
@@ -33,7 +33,7 @@ default_review = Review(
     review='Your review goes here...',
     reviewed_by='tenant',
     date=datetime.now(),
-    building=default_address,
+    address=default_address,
 )
 db.session.add(default_review)
 db.session.commit()

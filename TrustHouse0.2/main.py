@@ -15,13 +15,13 @@ db = SQLAlchemy(app)
 
 # db models
 # residence --> town / postcode
-class Building(db.Model):
+class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     door_num = db.Column(db.String(35), nullable=False)
     street = db.Column(db.String(60), nullable=False)
-    location = db.Column(db.String(50))
+    location = db.Column(db.String(50), nullable=False)
     postcode = db.Column(db.String(10), nullable=False)
-    reviews = db.relationship('Review', backref='building')
+    reviews = db.relationship('Review', backref='address')
 
 
 class Review(db.Model):
@@ -32,7 +32,7 @@ class Review(db.Model):
     picture_data = db.Column(db.LargeBinary)
     rendered_pic = db.Column(db.Text)
     date = db.Column(db.DateTime, nullable=False)
-    building_id = db.Column(db.Integer, db.ForeignKey('building.id'))
+    address_id = db.Column(db.Integer, db.ForeignKey('address.id'))
 
 @app.route("/")
 def landingpage():
@@ -59,12 +59,12 @@ class WriteReview(MethodView):
         review_pic = request.form['imgUpload']
 
         # get data to check if new review already exists
-        get_door_num = Building.query.filter_by(door_num=door).all()
-        get_postcode = Building.query.filter_by(postcode=postcode).all()
+        get_door_num = Address.query.filter_by(door_num=door).all()
+        get_postcode = Address.query.filter_by(postcode=postcode).all()
         get_review_content = Review.query.filter_by(review=review_text).all()
 
         if len(get_postcode) == 0:
-            new_address = Building(
+            new_address = Address(
                 door_num=door,
                 street=street_name,
                 location=town_city,
@@ -85,7 +85,6 @@ class WriteReview(MethodView):
         else:
             return 'something'
                 
-        return render_template('writeReviewPage.html')
 
 
 @app.route('/viewReviews')

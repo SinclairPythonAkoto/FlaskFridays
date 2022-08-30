@@ -40,7 +40,7 @@ def landingpage():
 
 class Home(MethodView):
     def get(self):
-        return render_template('homepage.html')
+        return render_template('homePage.html')
     
 class WriteReview(MethodView):
     def get(self):
@@ -83,7 +83,20 @@ class WriteReview(MethodView):
             message = 'Your review has been uploaded!'
             return message
         else:
-            return 'something'
+            if door == get_door_num[0].door_num and postcode == get_postcode[0].postcode:
+                if len(get_review_content) != 0:
+                    void = 'Dupliacte Review: please check and change the content within your review.'
+                    return void
+            new_review = Review(
+                rating=review_rating,
+                review=review_text,
+                reviewed_by=review_type,
+                date=datetime.now()
+            )
+            db.session.add(new_review)
+            db.session.commit()
+            message = f'A new review has been added to: {get_door_num[0].door_num}, {get_postcode[0].postcode}'
+            return message
                 
 
 

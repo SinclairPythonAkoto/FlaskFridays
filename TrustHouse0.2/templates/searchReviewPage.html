@@ -33,13 +33,13 @@
         <button type="submit">Find Reviews</button>
     </form>
     <br><br><br>
-    <form action="/" method="post" class="container" style="border-right: 5px solid red;">
+    <form action="{{ url_for('filter_door') }}" method="post" class="container" style="border-right: 5px solid red;">
         <label for="searchDoorNum">Find Review by Door Number: </label><br>
         <input type="text" name="searchDoorNum" id="searchDoorNum" placeholder="Enter door number" required>
         <button type="submit">Find Reviews</button>
     </form>
     <br><br><br><br><br><br><br>
-    <form action="/" method="post" class="container" style="border-right: 5px solid red;">
+    <form action="{{ url_for('filter_street') }}" method="post" class="container" style="border-right: 5px solid red;">
         <label for="searchStreetName">Find Review by Street Name: </label><br>
         <input type="text" name="searchStreetName" id="searchStreetName" placeholder="Enter street name" required>
         <button type="submit">Find Reviews</button>
@@ -124,7 +124,29 @@
     </div>
     {% endif %}
 
+    {% if filter_door %}
+    <br><br><br><br><br><br><br>
+    <div class="container">
+        <h1>Search by Door Number:</h1>
+        {% for review in filter_door %}
+        {% if user_door_request == review.address.door_num %}
+        <h5 style="color: red;">Review: </h5>
+        <p>{{ review.review }}</p>
+        <h5 style="color: red;">Rating: </h5>
+        <p>{{ review.rating }}</p>
+        <h6 style="color: red;">Date: </h6>
+        <p>{{ review.date }}</p>
+        <h5 style="color: red;">Address:</h5>
+        <p>
+            {{ review.address.door_num }}, 
+            {{ review.address.street }}, 
+            {{ review.address.location }}, 
+            {{ review.address.postcode }}.
+        </p>
+        <hr>
+        {% endif %}
+        {% endfor %}
     </div>
-
-
+    {% endif %}
+    </div>
 {% endblock %}

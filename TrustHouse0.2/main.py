@@ -65,10 +65,10 @@ class WriteReview(MethodView):
 
         if len(get_postcode) == 0:
             new_address = Address(
-                door_num=door,
-                street=street_name,
-                location=town_city,
-                postcode=postcode,
+                door_num=door.lower(),
+                street=street_name.lower(),
+                location=town_city.lower(),
+                postcode=postcode.lower(),
             )
             db.session.add(new_address)
             db.session.commit()
@@ -165,12 +165,35 @@ class FilterByRating(MethodView):
         get_ratings = db.session.query(Review).filter_by(rating=user_rating_request).all()
         return render_template('searchReviewPage.html', get_ratings=get_ratings)
 
+class FilterByDoorNumber(MethodView):
+    def post(self):
+        user_door_request = request.form['searchDoorNum']
+        check_request = db.session.query(
+            db.session.query(Address).filter_by(door_num=user_door_request).exists()
+        ).scalar()
+        print(check_request)
+        if check_request == False:
+            void = 'No match found.'
+            return render_template('searchReviewPage.html', void=void)
+        filter_door = Review.query.all() 
+        return render_template(
+            'searchReviewPage.html',
+            user_door_request=user_door_request,
+            filter_door=filter_door,
+        )
+
+class FilterByStreetName(MethodView):
+    def post(self):
+        return 'hello'
+
 
 app.add_url_rule('/home', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/writeReview', view_func=WriteReview.as_view(name='write_review'))
 app.add_url_rule('/reviews/all', view_func=DisplayAllReviews.as_view(name='all_reviews'))
 app.add_url_rule('/reviews/all/locations', view_func=DisplayListedLocations.as_view(name='listed_locations'))
 app.add_url_rule('/reviews/rating', view_func=FilterByRating.as_view(name='filter_ratings'))
+app.add_url_rule('/reviews/door_number', view_func=FilterByDoorNumber.as_view(name='filter_door'))
+app.add_url_rule('/reviews/street', view_func=FilterByStreetName.as_view(name='filter_street'))
 
 
 if __name__ == "__main__":

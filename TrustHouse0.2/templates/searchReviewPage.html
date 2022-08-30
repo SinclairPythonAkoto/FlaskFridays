@@ -148,5 +148,32 @@
         {% endfor %}
     </div>
     {% endif %}
+
+    {% if filter_street %}
+    <br><br><br><br><br><br><br>
+    <div class="container">
+        <h1>Search by Street Name:</h1>
+        {% for review in filter_street %}
+        {% if user_street_request == review.address.street %}
+        <h5 style="color: red;">Review: </h5>
+        <p>{{ review.review }}</p>
+        <h5 style="color: red;">Rating: </h5>
+        <p>{{ review.rating }}</p>
+        <h6 style="color: red;">Date: </h6>
+        <p>{{ review.date }}</p>
+        <h5 style="color: red;">Address:</h5>
+        <p>
+            {{ review.address.door_num }}, 
+            {{ review.address.street }}, 
+            {{ review.address.location }}, 
+            {{ review.address.postcode }}.
+        </p>
+        <hr>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
     </div>
 {% endblock %}

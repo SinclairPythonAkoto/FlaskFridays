@@ -171,7 +171,6 @@ class FilterByDoorNumber(MethodView):
         check_request = db.session.query(
             db.session.query(Address).filter_by(door_num=user_door_request).exists()
         ).scalar()
-        print(check_request)
         if check_request == False:
             void = 'No match found.'
             return render_template('searchReviewPage.html', void=void)
@@ -184,7 +183,19 @@ class FilterByDoorNumber(MethodView):
 
 class FilterByStreetName(MethodView):
     def post(self):
-        return 'hello'
+        user_street_request = request.form['searchStreetName']
+        check_request = db.session.query(
+            db.session.query(Address).filter_by(street=user_street_request).exists()
+        ).scalar()
+        if check_request == False:
+            void = 'No match found.'
+            return render_template('searchReviewPage.html', void=void)
+        filter_street = Review.query.all()
+        return render_template(
+            'searchReviewPage.html',
+            user_street_request=user_street_request,
+            filter_street=filter_street,
+        )
 
 
 app.add_url_rule('/home', view_func=Home.as_view(name='homepage'))

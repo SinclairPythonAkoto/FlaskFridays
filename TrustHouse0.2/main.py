@@ -152,11 +152,25 @@ class DisplayListedLocations(MethodView):
         listed_locations = Address.query.all()
         return render_template('searchReviewPage.html', listed_locations=listed_locations)
 
+class FilterByRating(MethodView):
+    def post(self):
+        user_rating_request = request.form['searchRating']
+        user_rating_request = int(user_rating_request)
+        check_request = db.session.query(
+            db.session.query(Review).filter_by(rating=user_rating_request).exists()
+        ).scalar()
+        if check_request == False:
+            void = 'No match found.'
+            return render_template('searchReviewPage.html', void=void)
+        get_ratings = db.session.query(Review).filter_by(rating=user_rating_request).all()
+        return render_template('searchReviewPage.html', get_ratings=get_ratings)
+
 
 app.add_url_rule('/home', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/writeReview', view_func=WriteReview.as_view(name='write_review'))
 app.add_url_rule('/reviews/all', view_func=DisplayAllReviews.as_view(name='all_reviews'))
 app.add_url_rule('/reviews/all/locations', view_func=DisplayListedLocations.as_view(name='listed_locations'))
+app.add_url_rule('/reviews/rating', view_func=FilterByRating.as_view(name='filter_ratings'))
 
 
 if __name__ == "__main__":

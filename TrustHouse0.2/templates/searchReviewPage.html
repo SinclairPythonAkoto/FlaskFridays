@@ -27,7 +27,7 @@
     <h1 class="container">Trust House Search Engine</h1>
     <br><br><br>
     <div >
-    <form action="/" method="post" class="container" style="border-right: 5px solid red;">
+    <form action="{{ url_for('filter_ratings') }}" method="post" class="container" style="border-right: 5px solid red;">
         <label for="searchRating">Find Review by Rating: </label><br>
         <input type="number" name="searchRating" id="searchRating" placeholder="Enter a rating from 1 - 5" required>
         <button type="submit">Find Reviews</button>
@@ -56,6 +56,14 @@
         <input type="text" name="searchPostcode" id="searchPostcode" placeholder="Enter postcode" required>
         <button type="submit">Find Reviews</button>
     </form>
+
+    {% if void %}
+    <br><br><br><br><br><br><br>
+    <div class="container">
+        <h1>{{ error }}</h1>
+    </div>
+    {% endif %}
+
 
     {% if get_reviews %}
     <br><br><br><br><br><br><br>
@@ -87,6 +95,30 @@
         <h1>Listed Locatoins:</h1>
         {% for building in listed_locations %}
         <p>{{ building.location }}</p>
+        <hr>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    {% if get_ratings %}
+    <br><br><br><br><br><br><br>
+    <div class="container">
+        <H1>Search by Rating:</H1>
+        {% for review in get_ratings %}
+        <h5 style="color: red;">Review: </h5>
+        <p>{{ review.review }}</p>
+        <h5 style="color: red;">Rating: </h5>
+        <p>{{ review.rating }}</p>
+        <h6 style="color: red;">Date: </h6>
+        <p>{{ review.date }}</p>
+        <h5 style="color: red;">Address:</h5>
+        <p>
+            {{ review.address.door_num }}, 
+            {{ review.address.street }}, 
+            {{ review.address.location }}, 
+            {{ review.address.postcode }}.
+        </p>
         <hr>
         {% endfor %}
     </div>

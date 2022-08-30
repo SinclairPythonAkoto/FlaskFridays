@@ -60,11 +60,26 @@
         <input type="text" name="searchPostcode" id="searchPostcode" placeholder="Enter postcode" required>
         <button type="submit">Find Reviews</button>
     </form>
-    <br><br><br><br><br><br><br>
     {% if get_reviews %}
+    <br><br><br><br><br><br><br>
     <div class="container">
         <h1>All Reviews</h1>
-        <p>{{ get_reviews[0].address.door_num }}</p>
+        {% for review in get_reviews %}
+        <h5>Review: </h5>
+        <p>{{ review.review }}</p>
+        <h5>Rating: </h5>
+        <p>{{ review.rating }} </p>
+        <h6>Date: </h6>
+        <p>{{ review.date }}</p>
+        <h5>Address:</h5>
+        <p>
+            {{ review.address.door_num }}, 
+            {{ review.address.street }}, 
+            {{ review.address.location }}, 
+            {{ review.address.postcode }}.
+        </p>
+        <hr>
+        {% endfor %}
     </div>
     {% endif %}
     </div>

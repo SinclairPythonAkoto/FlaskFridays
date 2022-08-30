@@ -83,22 +83,61 @@ class WriteReview(MethodView):
             message = 'Your review has been uploaded!'
             return message
         else:
-            if door == get_door_num[0].door_num and postcode == get_postcode[0].postcode:
-                if len(get_review_content) != 0:
-                    void = 'Dupliacte Review: please check and change the content within your review.'
-                    return void
-            new_review = Review(
-                rating=review_rating,
-                review=review_text,
-                reviewed_by=review_type,
-                date=datetime.now()
-            )
-            db.session.add(new_review)
-            db.session.commit()
-            message = f'A new review has been added to: {get_door_num[0].door_num}, {get_postcode[0].postcode}'
-            return message
-                
-
+            # print(len(get_door_num.door_num))
+            if door == get_postcode[0].door_num and postcode == get_postcode[0].postcode:
+                if len(get_postcode) != 0:
+                    new_review = Review(
+                        rating=review_rating,
+                        review=review_text,
+                        reviewed_by=review_type,
+                        date=datetime.now(),
+                        address=get_postcode[0],
+                    )
+                    db.session.add(new_review)
+                    db.session.commit()
+                    message = f'A new review has been added to: {get_postcode[0].door_num}, {get_postcode[0].postcode}'
+                    return message
+            elif door != get_postcode[0].door_num and postcode == get_postcode[0].postcode:
+                new_address = Address(
+                    door_num=door,
+                    street=street_name,
+                    location=town_city,
+                    postcode=postcode,
+                )
+                db.session.add(new_address)
+                db.session.commit()
+                new_review = Review(
+                    rating=review_rating,
+                    review=review_text,
+                    reviewed_by=review_type,
+                    date=datetime.now(),
+                    address=get_postcode[0],
+                )
+                db.session.add(new_review)
+                db.session.commit()
+                message = 'Your review has been uploaded!'
+                return message
+            elif door == get_postcode[0].door_num and postcode != get_postcode[0].postcode:
+                new_address = Address(
+                    door_num=door,
+                    street=street_name,
+                    location=town_city,
+                    postcode=postcode,
+                )
+                db.session.add(new_address)
+                db.session.commit()
+                new_review = Review(
+                    rating=review_rating,
+                    review=review_text,
+                    reviewed_by=review_type,
+                    date=datetime.now(),
+                    address=get_postcode[0],
+                )
+                db.session.add(new_review)
+                db.session.commit()
+                message = 'Your review has been uploaded!'
+                return message
+                    
 @app.route('/viewReviews')
 def view_reviews():
     return render_template('searchReviewPage.html')

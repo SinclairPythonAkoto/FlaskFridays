@@ -15,7 +15,7 @@
     
     <div class="bg-img">
     </div>
-    <form action="/" method="post" class="container">
+    <form action="{{ url_for('all_reviews') }}" method="post" class="container">
         <button type="submit">All Reviews</button>
     </form>
     <div>
@@ -60,8 +60,15 @@
         <input type="text" name="searchPostcode" id="searchPostcode" placeholder="Enter postcode" required>
         <button type="submit">Find Reviews</button>
     </form>
+    <br><br><br><br><br><br><br>
+    {% if get_reviews %}
+    <div class="container">
+        <h1>All Reviews</h1>
+        <p>{{ get_reviews[0].address.door_num }}</p>
+    </div>
+    {% endif %}
     </div>
         
 
-        
+    
 {% endblock %}

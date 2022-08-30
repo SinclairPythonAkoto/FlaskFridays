@@ -99,14 +99,20 @@ class WriteReview(MethodView):
             return message
                 
 
-
 @app.route('/viewReviews')
 def view_reviews():
     return render_template('searchReviewPage.html')
 
+class DisplayAllReviews(MethodView):
+    def post(self):
+        get_reviews = Review.query.all()
+        return render_template('searchReviewPage.html', get_reviews=get_reviews)
+
 
 app.add_url_rule('/home', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/writeReview', view_func=WriteReview.as_view(name='write_review'))
+app.add_url_rule('/reviews/all', view_func=DisplayAllReviews.as_view(name='all_reviews'))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

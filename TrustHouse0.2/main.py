@@ -1,4 +1,3 @@
-from inspect import _void
 from flask import Flask 
 from flask import render_template, url_for, request, jsonify
 from flask.views import View, MethodView
@@ -35,9 +34,10 @@ class Review(db.Model):
     date = db.Column(db.DateTime, nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'))
 
-@app.route("/")
-def landingpage():
-    return render_template("landingPage.html")
+
+class LandingPage(MethodView):
+    def get(self):
+        return render_template('landingPage.html')
 
 class Home(MethodView):
     def get(self):
@@ -139,11 +139,13 @@ class WriteReview(MethodView):
                 message = 'Your review has been uploaded!'
                 return message
                     
-@app.route('/viewReviews')
-def view_reviews():
-    return render_template('searchReviewPage.html')
+# @app.route('/viewReviews')
+# def view_reviews():
+#     return render_template('searchReviewPage.html')
 
 class DisplayAllReviews(MethodView):
+    def get(self):
+        return render_template('searchReviewPage.html')
     def post(self):
         get_reviews = Review.query.all()
         return render_template('searchReviewPage.html', get_reviews=get_reviews)
@@ -214,14 +216,245 @@ class FilterByLocation(MethodView):
             filter_location=filter_location,
         )
 
+class FilterByPostcode(MethodView):
+    def post(self):
+        user_postcode_request = request.form['searchPostcode']
+        check_request = db.session.query(
+            db.session.query(Address).filter_by(postcode=user_postcode_request).exists()
+        ).scalar()
+        if check_request == False:
+            void = 'No match found.'
+            return render_template('searchReviewPage.html', void=void)
+        filter_postcode = Review.query.all()
+        return render_template(
+            'searchReviewPage.html',
+            user_postcode_request=user_postcode_request,
+            filter_postcode=filter_postcode,
+        )
+
+class DisplayAllAddressesAPI(MethodView):
+    def get(self):
+        all_address = Address.query.all()
+        db_query_result = []
+        for address in all_address:
+            result = {
+                'id': address.id,
+                'Door Number': address.door_num,
+                'Street Name': address.street,
+                'Location': address.location,
+                'Postcode': address.postcode,
+            }
+            db_query_result.append(result)
+        data = {'All Addresses': db_query_result}
+        return jsonify(data)
+
+class AllReviewsAPI(MethodView):
+    def get(self):
+        all_reviews = Review.query.all()
+        res = []
+        print(all_reviews)
+        for review in all_reviews:
+            result = {
+                'id': review.id,
+                'Rating': review.rating,
+                'Review': review.review,
+                'Reviewed By': review.reviewed_by,
+                'Date': review.date,
+                # 'Address ID': review.address_id,
+                # 'Address': {
+                #     'id': review.address.id,
+                #     'Door Number': review.address.door_num,
+                #     'Street': review.address.street,
+                #     'Postode': review.address.postcode,
+                # },
+            }
+            res.append(result)
+        data = {'all reviews': res}
+        return jsonify(data)
+
+class FilterByRatingAPI(MethodView):
+    def get(self, rating):
+        user_rating_request = int(rating)
+        check_request = db.session.query(
+            db.session.query(Review).filter_by(rating=user_rating_request).exists()
+        ).scalar()
+        if check_request == False:
+            void = {'Void': 'No match found'}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        for review in get_reviews:
+            result = {
+                'id': review.id,
+                'Rating': review.rating,
+                'Review': review.review,
+                'Reviewed By': review.reviewed_by,
+                'Date': review.date,
+                'Address ID': review.address_id,
+                # 'Address': {
+                #     'id': review.address.id,
+                #     'Door Number': review.address.door_num,
+                #     'Street': review.address.street,
+                #     'Postode': review.address.postcode,
+                # },
+            }
+            res.append(result)
+        data = {'Reviews by Door Number': res}
+        return jsonify(data)
+
+class FilterByDoorAPI(MethodView):
+    def get(self, door):
+        user_door_request = door
+        check_val = db.session.query(
+            db.session.query(Address).filter_by(door_num=user_door_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = {'void': 'no match found'}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        print(get_reviews)
+        for review in get_reviews:
+            if user_door_request == review.address.door_num:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Reviewed By': review.reviewed_by,
+                    'Date': review.date,
+                    'Address ID': review.address_id,
+                    # 'Address': {
+                    #     'id': review.address.id,
+                    #     'Door Number': review.address.door_num,
+                    #     'Street': review.address.street,
+                    #     'Postode': review.address.postcode,
+                    # },
+                }
+                res.append(result)
+        data = {'search by door number': res}
+        return jsonify(data)
+
+class FilterByStreetAPI(MethodView):
+    def get(self, street):
+        user_street_request = street
+        check_val = db.session.query(
+            db.session.query(Address).filter_by(street=user_street_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = {'void': 'no match found'}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        for review in get_reviews:
+            if user_street_request == review.address.street:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Reviewed By': review.reviewed_by,
+                    'Date': review.date,
+                    'Address ID': review.address_id,
+                    # 'Address': {
+                    #     'id': review.address.id,
+                    #     'Door Number': review.address.street,
+                    #     'Street': review.address.street,
+                    #     'Postode': review.address.postcode,
+                    # },
+                }
+                res.append(result)
+        data = {'search by street': res}
+        return jsonify(data)
+
+class FilterByLocationAPI(MethodView):
+    def get(self, location):
+        user_location_request = location
+        check_val = db.session.query(
+            db.session.query(Address).filter_by(location=user_location_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = {'void': 'no match found'}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        for review in get_reviews:
+            if user_location_request == review.address.location:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Reviewed By': review.reviewed_by,
+                    'Date': review.date,
+                    'Address ID': review.address_id,
+                    # 'Address': {
+                    #     'id': review.address.id,
+                    #     'Door Number': review.address.street,
+                    #     'Street': review.address.street,
+                    #     'Postode': review.address.postcode,
+                    # },
+                }
+                res.append(result)
+        data = {'search by location': res}
+        return jsonify(data)    
+
+class FilterByPostcodeAPI(MethodView):
+    def get(self, postcode):
+        user_postcode_request = postcode
+        check_val = db.session.query(
+            db.session.query(Address).filter_by(postcode=user_postcode_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = {'void': 'no match found'}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        for review in get_reviews:
+            if user_postcode_request == review.address.postcode:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Reviewed By': review.reviewed_by,
+                    'Date': review.date,
+                    'Address ID': review.address_id,
+                    # 'Address': {
+                    #     'id': review.address.id,
+                    #     'Door Number': review.address.street,
+                    #     'Street': review.address.street,
+                    #     'Postode': review.address.postcode,
+                    # },
+                }
+                res.append(result)
+        data = {'search by postcode': res}
+        return jsonify(data)
+
+class UploadAddressAPI(MethodView):
+    def get(self):
+        return 'hello'
+    
+    def post(self):
+        return 'data sent!'
+
+app.add_url_rule('/', view_func=LandingPage.as_view(name='landingpage'))
 app.add_url_rule('/home', view_func=Home.as_view(name='homepage'))
 app.add_url_rule('/writeReview', view_func=WriteReview.as_view(name='write_review'))
+app.add_url_rule('/viewReview', view_func=DisplayAllReviews.as_view(name='view_reviews'))
 app.add_url_rule('/reviews/all', view_func=DisplayAllReviews.as_view(name='all_reviews'))
 app.add_url_rule('/reviews/all/locations', view_func=DisplayListedLocations.as_view(name='listed_locations'))
 app.add_url_rule('/reviews/rating', view_func=FilterByRating.as_view(name='filter_ratings'))
 app.add_url_rule('/reviews/door_number', view_func=FilterByDoorNumber.as_view(name='filter_door'))
 app.add_url_rule('/reviews/street', view_func=FilterByStreetName.as_view(name='filter_street'))
 app.add_url_rule('/reviews/location', view_func=FilterByLocation.as_view(name='filter_location'))
+app.add_url_rule('/reviews/postcode', view_func=FilterByPostcode.as_view(name='filter_postcode'))
+# (get) API routes
+app.add_url_rule('/API/address', view_func=DisplayAllAddressesAPI.as_view(name='display_address_API'))
+app.add_url_rule('/API/reviews', view_func=AllReviewsAPI.as_view(name='review_API'))
+app.add_url_rule('/API/rating/<rating>', view_func=FilterByRatingAPI.as_view(name='filter_rating_API'))
+app.add_url_rule('/API/door/<door>', view_func=FilterByDoorAPI.as_view(name='filter_door_API'))
+app.add_url_rule('/API/street/<street>', view_func=FilterByStreetAPI.as_view(name='filter_street_API'))
+app.add_url_rule('/API/location/<location>', view_func=FilterByLocationAPI.as_view(name='filter_location_API'))
+app.add_url_rule('/API/postcode/<postcode>', view_func=FilterByPostcodeAPI.as_view(name='filter_postcode_API'))
+# (post) API route
+app.add_url_rule('/createAddress', view_func=UploadAddressAPI.as_view(name='upload_address'))
 
 
 if __name__ == "__main__":

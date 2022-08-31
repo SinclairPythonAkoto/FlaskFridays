@@ -11,6 +11,13 @@
     <script src="https://kit.fontawesome.com/fbfdd5a072.js" crossorigin="anonymous"></script>
 {% endblock %}
 
+{% if message %}
+<br><br><br><br><br><br><br><br>
+<div class="container">
+	<h1>{{ message }}</h1>
+</div>
+{% endif %}
+
 {% block content %}
     <h1>Write A Review</h1>
     <!-- Create a review form -->

@@ -1,10 +1,12 @@
 from flask import Flask 
-from flask import render_template, url_for, request, jsonify, flash
+from flask import render_template, url_for, request, jsonify, flash, redirect
 from flask.views import View, MethodView
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
+
+app.secret_key = 'my secret'    # this will be env variable
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///trusthouse.sqlite3"
 app.config["TRACK_MODIFICATIONS"] = True
@@ -55,6 +57,7 @@ class WriteReview(MethodView):
         postcode = request.form['postcode']
         # review data
         review_rating = request.form['rating']
+        review_rating = int(review_rating)
         review_text = request.form['reviewText']
         review_type = request.form['selection']
         review_pic = request.form['imgUpload']
@@ -77,16 +80,16 @@ class WriteReview(MethodView):
                 rating=review_rating,
                 review=review_text,
                 reviewed_by=review_type,
-                date=datetime.now()
+                date=datetime.now(),
+                address=new_address,
             )
             db.session.add(new_review)
             db.session.commit()
             message = 'Your review has been uploaded!'
-            return message
+            return render_template('writeReviewPage.html', message=message)
         else:
-            # print(len(get_door_num.door_num))
-            if door == get_postcode[0].door_num and postcode == get_postcode[0].postcode:
-                if len(get_postcode) != 0:
+            if door == get_door_num[0].door_num and postcode == get_postcode[0].postcode:
+                if len(get_review_content) != 0:
                     new_review = Review(
                         rating=review_rating,
                         review=review_text,
@@ -96,17 +99,8 @@ class WriteReview(MethodView):
                     )
                     db.session.add(new_review)
                     db.session.commit()
-                    message = f'A new review has been added to: {get_postcode[0].door_num}, {get_postcode[0].postcode}'
-                    return message
-            elif door != get_postcode[0].door_num and postcode == get_postcode[0].postcode:
-                new_address = Address(
-                    door_num=door,
-                    street=street_name,
-                    location=town_city,
-                    postcode=postcode,
-                )
-                db.session.add(new_address)
-                db.session.commit()
+                    message = 'A new review has been added to an existing postcode.'
+                    return render_template('writeReviewPage.html', message=message)
                 new_review = Review(
                     rating=review_rating,
                     review=review_text,
@@ -116,32 +110,9 @@ class WriteReview(MethodView):
                 )
                 db.session.add(new_review)
                 db.session.commit()
-                message = 'Your review has been uploaded!'
-                return message
-            elif door == get_postcode[0].door_num and postcode != get_postcode[0].postcode:
-                new_address = Address(
-                    door_num=door,
-                    street=street_name,
-                    location=town_city,
-                    postcode=postcode,
-                )
-                db.session.add(new_address)
-                db.session.commit()
-                new_review = Review(
-                    rating=review_rating,
-                    review=review_text,
-                    reviewed_by=review_type,
-                    date=datetime.now(),
-                    address=get_postcode[0],
-                )
-                db.session.add(new_review)
-                db.session.commit()
-                message = 'Your review has been uploaded!'
-                return message
-                    
-# @app.route('/viewReviews')
-# def view_reviews():
-#     return render_template('searchReviewPage.html')
+                message = 'A new review has been added'
+                return render_template('writeReviewPage.html', message=message)
+                
 
 class DisplayAllReviews(MethodView):
     def get(self):

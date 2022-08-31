@@ -128,6 +128,7 @@
     <br><br><br><br><br><br><br><br>
     <div class="container">
         <h1>Search by Door Number:</h1>
+        <br><br>
         {% for review in filter_door %}
         {% if user_door_request == review.address.door_num %}
         <h5 style="color: red;">Review: </h5>

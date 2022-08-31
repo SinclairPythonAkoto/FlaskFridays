@@ -1,12 +1,10 @@
 from flask import Flask 
-from flask import render_template, url_for, request, jsonify, flash, redirect
+from flask import render_template, url_for, request, jsonify
 from flask.views import View, MethodView
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-
-app.secret_key = 'my secret'    # this will be env variable
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///trusthouse.sqlite3"
 app.config["TRACK_MODIFICATIONS"] = True

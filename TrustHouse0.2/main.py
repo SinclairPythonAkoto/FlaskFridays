@@ -429,7 +429,7 @@ class FilterByPostcodeAPI(MethodView):
 
 class UploadAddressAPI(MethodView):
     def get(self):
-        return 'hello'
+        return render_template('newAddress.html')
     
     def post(self):
         return 'data sent!'

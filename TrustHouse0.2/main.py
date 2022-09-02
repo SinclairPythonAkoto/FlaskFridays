@@ -27,7 +27,7 @@ class Address(db.Model):
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer, nullable=False)
-    review = db.Column(db.Text, nullable=False, unique=True)
+    review = db.Column(db.Text, nullable=False)
     reviewed_by = db.Column(db.String(20), nullable=False)
     picture_data = db.Column(db.LargeBinary)
     rendered_pic = db.Column(db.Text)
@@ -229,13 +229,13 @@ class AllReviewsAPI(MethodView):
                 'Review': review.review,
                 'Reviewed By': review.reviewed_by,
                 'Date': review.date,
-                # 'Address ID': review.address_id,
-                # 'Address': {
-                #     'id': review.address.id,
-                #     'Door Number': review.address.door_num,
-                #     'Street': review.address.street,
-                #     'Postode': review.address.postcode,
-                # },
+                'Address ID': review.address_id,
+                'Address': {
+                    'id': review.address.id,
+                    'Door Number': review.address.door_num,
+                    'Street': review.address.street,
+                    'Postode': review.address.postcode,
+                },
             }
             res.append(result)
         data = {'all reviews': res}
@@ -260,12 +260,12 @@ class FilterByRatingAPI(MethodView):
                 'Reviewed By': review.reviewed_by,
                 'Date': review.date,
                 'Address ID': review.address_id,
-                # 'Address': {
-                #     'id': review.address.id,
-                #     'Door Number': review.address.door_num,
-                #     'Street': review.address.street,
-                #     'Postode': review.address.postcode,
-                # },
+                'Address': {
+                    'id': review.address.id,
+                    'Door Number': review.address.door_num,
+                    'Street': review.address.street,
+                    'Postode': review.address.postcode,
+                },
             }
             res.append(result)
         data = {'Reviews by Door Number': res}
@@ -292,12 +292,12 @@ class FilterByDoorAPI(MethodView):
                     'Reviewed By': review.reviewed_by,
                     'Date': review.date,
                     'Address ID': review.address_id,
-                    # 'Address': {
-                    #     'id': review.address.id,
-                    #     'Door Number': review.address.door_num,
-                    #     'Street': review.address.street,
-                    #     'Postode': review.address.postcode,
-                    # },
+                    'Address': {
+                        'id': review.address.id,
+                        'Door Number': review.address.door_num,
+                        'Street': review.address.street,
+                        'Postode': review.address.postcode,
+                    },
                 }
                 res.append(result)
         data = {'search by door number': res}
@@ -323,12 +323,12 @@ class FilterByStreetAPI(MethodView):
                     'Reviewed By': review.reviewed_by,
                     'Date': review.date,
                     'Address ID': review.address_id,
-                    # 'Address': {
-                    #     'id': review.address.id,
-                    #     'Door Number': review.address.street,
-                    #     'Street': review.address.street,
-                    #     'Postode': review.address.postcode,
-                    # },
+                    'Address': {
+                        'id': review.address.id,
+                        'Door Number': review.address.street,
+                        'Street': review.address.street,
+                        'Postode': review.address.postcode,
+                    },
                 }
                 res.append(result)
         data = {'search by street': res}
@@ -354,12 +354,12 @@ class FilterByLocationAPI(MethodView):
                     'Reviewed By': review.reviewed_by,
                     'Date': review.date,
                     'Address ID': review.address_id,
-                    # 'Address': {
-                    #     'id': review.address.id,
-                    #     'Door Number': review.address.street,
-                    #     'Street': review.address.street,
-                    #     'Postode': review.address.postcode,
-                    # },
+                    'Address': {
+                        'id': review.address.id,
+                        'Door Number': review.address.street,
+                        'Street': review.address.street,
+                        'Postode': review.address.postcode,
+                    },
                 }
                 res.append(result)
         data = {'search by location': res}
@@ -385,12 +385,12 @@ class FilterByPostcodeAPI(MethodView):
                     'Reviewed By': review.reviewed_by,
                     'Date': review.date,
                     'Address ID': review.address_id,
-                    # 'Address': {
-                    #     'id': review.address.id,
-                    #     'Door Number': review.address.street,
-                    #     'Street': review.address.street,
-                    #     'Postode': review.address.postcode,
-                    # },
+                    'Address': {
+                        'id': review.address.id,
+                        'Door Number': review.address.street,
+                        'Street': review.address.street,
+                        'Postode': review.address.postcode,
+                    },
                 }
                 res.append(result)
         data = {'search by postcode': res}

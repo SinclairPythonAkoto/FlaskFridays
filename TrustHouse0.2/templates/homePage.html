@@ -183,7 +183,7 @@ House Trust
         </div>
         <div class="flip-box-back">
             <h2>Messy Housemates / Flatmates</h2>
-        <p>Unkepmt house mates making it difficult to live iwht them..</p>
+        <p>Unkepmt house mates making it difficult to live with them..</p>
         </div>
     </div>
     </div>
@@ -202,9 +202,7 @@ House Trust
     </div>
 </div>
 
-<br>
-<br>
-<div id="instructions">
+<div class="container" id="instructions">
     <div class="w3-container" style="margin-top:80px">
         <h1 class="w3-xxlarge"><b>Instructions</b></h1>
         <hr style="width:50px;border:5px solid red" class="w3-round"/>
@@ -217,10 +215,34 @@ House Trust
         <li>Write your review.</li>
         <li>Upload your review</li>
         </ol>
-
+        <a href="{{ url_for('write_review') }}" style="color: red;">Write a review</a>
     </div>
-    <a href="{{ url_for('write_review') }}" style="color: red;">Write a review</a>
 </div>
+
+<div class="container" id="TrustHouseAPI">
+    <div class="w3-container" style="margin-top: 80px;">
+        <h1 class="w3-xxxlarge"><b>Trust House API</b></h1>
+        <hr style="width: 50px; border: 5px solid red" class="w3-round">
+        <p>
+            The API enables users to interact with the database within the brower and allows other developers
+            to use the data obtained within their own apps or systems. In order to use the API correctly, 
+            please follow the following instructions: 
+            <br><br>
+            <b>Get All Addresses: </b><i>/api/address</i><br>
+            <b>Get All Reviews: </b><i>/api/reviews</i><br>
+            <b>Find Review by Rating: </b><i>/api/rating/...</i><br>
+            <b>Find Review by Property Door Number: </b><i>/api/door/...</i><br>
+            <b>Find Review by Street Name: </b><i>/api/street/...</i><br>
+            <b>Find Review by Location:</b><i>/api/location/...</i><br>
+            <b>Find Review by Postcode: </b><i>/api/postocde/...</i>
+        </p>
+        <p>
+            Users can also upload a new address into the database by clicking 
+            <a href="{{ url_for('upload_address') }}" style="color: red;">here</a>.
+        </p>
+    </div>
+</div>
+
 </div>
 
 {% endblock %}

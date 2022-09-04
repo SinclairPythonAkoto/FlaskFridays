@@ -22,7 +22,7 @@ class Address(db.Model):
     street = db.Column(db.String(60), nullable=False)
     location = db.Column(db.String(50), nullable=False)
     postcode = db.Column(db.String(10), nullable=False)
-    geo_map = db.relationship('Maps', backref='map', uselist=False)
+    geo_map = db.relationship('Maps', backref='location', uselist=False)
     reviews = db.relationship('Review', backref='address')
 
 # one to one
@@ -240,8 +240,8 @@ class FilterByPostcode(MethodView):
 class TrustHouseMap(MethodView):
     def get(self):
         coordinates = Maps.query.all()
-        longitude = coordinates[2].lon
-        latitude = coordinates[2].lat
+        longitude = '-0.1244477'
+        latitude = '51.4994252'
         location = float(latitude), float(longitude)
         map = folium.Map(
             location=location,
@@ -253,7 +253,9 @@ class TrustHouseMap(MethodView):
             lat = geocode.lat
             folium.Marker(
                 location=[float(lat), float(long)],   # or [45.54356, 12.45678]
-                popup='User Review',
+                popup=geocode.location.postcode.upper(),
+                tooltip='*** Reviews',    # info appears when mouse is hovered over point
+                icon=folium.Icon(color='red') 
             ).add_to(map)
         return map._repr_html_()
 

@@ -7,7 +7,7 @@ from pprint import pprint
 BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
 
 
-postcode = 'G42 9AY'
+postcode = 'SW1A 0AA'
 london = 'sw17 0en'
 
 response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")

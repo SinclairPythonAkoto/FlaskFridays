@@ -252,10 +252,10 @@ class TrustHouseMap(MethodView):
             long = geocode.lon
             lat = geocode.lat
             folium.Marker(
-                location=[float(lat), float(long)],   # or [45.54356, 12.45678]
+                location=[float(lat), float(long)],
                 popup=geocode.location.postcode.upper(),
                 tooltip='*** Reviews',    # info appears when mouse is hovered over point
-                icon=folium.Icon(color='red') 
+                icon=folium.Icon(color='red', icon='home', prefix='fa') 
             ).add_to(map)
         return map._repr_html_()
 

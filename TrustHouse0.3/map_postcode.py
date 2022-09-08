@@ -12,7 +12,7 @@ geolocator = Nominatim(user_agent='geoapiExercises')
 
 
 # postcode = 'SW1A 0AA'
-london = 'sw17 0en'
+london = 'cr0 2up'
 
 # response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")
 response2 = requests.get(f"{BASE_URL}&postalcode={london}&country=united kingdom")

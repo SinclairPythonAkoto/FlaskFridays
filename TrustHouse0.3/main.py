@@ -5,6 +5,7 @@ from flask.views import View, MethodView
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import requests
+from geopy.geocoders import Nominatim
 import folium
 
 app = Flask(__name__)
@@ -65,8 +66,6 @@ class WriteReview(MethodView):
         review_rating = int(review_rating)
         review_text = request.form['reviewText']
         review_type = request.form['selection']
-        review_pic = request.files['imgUpload']
-
 
         # get data to check if new review already exists
         get_door_num = Address.query.filter_by(door_num=door).all()
@@ -87,14 +86,14 @@ class WriteReview(MethodView):
             # get latitude & logitude from user postcode
             response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")
             data = response.json()
-            # if their is an existing latitude & longitude
+            # if there is an existing latitude & longitude
             if data[0]:
                 latitude = data[0].get('lat')
                 longitude = data[0].get('lon')
                 new_geo_map = Maps(
                     lon=longitude,
                     lat=latitude,
-                    map=new_address,
+                    location=new_address,
                 )
                 db.session.add(new_geo_map)
                 db.session.commit()
@@ -146,6 +145,39 @@ class WriteReview(MethodView):
                 db.session.commit()
                 message = 'A new review has been added'
                 return render_template('writeReviewPage.html', message=message)
+            else:
+                new_address = Address(
+                    door_num=door.lower(),
+                    street=street_name.lower(),
+                    location=town_city.lower(),
+                    postcode=postcode.lower(),
+                )
+                db.session.add(new_address)
+                db.session.commit()
+                response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")
+                data = response.json()
+                # if there is an existing latitude & longitude
+                if data[0]:
+                    latitude = data[0].get('lat')
+                    longitude = data[0].get('lon')
+                    new_geo_map = Maps(
+                        lon=longitude,
+                        lat=latitude,
+                        location=new_address,
+                    )
+                    db.session.add(new_geo_map)
+                    db.session.commit()
+                    new_review = Review(
+                        rating=review_rating,
+                        review=review_text,
+                        type=review_type,
+                        date=datetime.now(),
+                        address=new_address,
+                    )
+                    db.session.add(new_review)
+                    db.session.commit()
+                    message = 'Your review has been uploaded!'
+                    return render_template('writeReviewPage.html', message=message)
                 
 
 class DisplayAllReviews(MethodView):
@@ -246,15 +278,22 @@ class TrustHouseMap(MethodView):
         map = folium.Map(
             location=location,
             tiles='Stamen Terrain',
-            zoom_start=12,
+            zoom_start=9,
         )
+        geolocator = Nominatim(user_agent='geoapiExercises')
         for geocode in coordinates:
             long = geocode.lon
             lat = geocode.lat
+            # get street name from latitude & longitude
+            street_location = geolocator.reverse(f'{lat},{long}')
+            street_location = str(street_location)
+            data = street_location.split(',')
+
+            # adding the points to the map
             folium.Marker(
                 location=[float(lat), float(long)],
-                popup=f'{geocode.location.street}, {geocode.location.postcode.upper()}',
-                tooltip='check potcode',    # info appears when mouse is hovered over point
+                popup=f'{data[1]}, {geocode.location.postcode.upper()}',
+                tooltip='check address',
                 icon=folium.Icon(color='red', icon='home', prefix='fa') 
             ).add_to(map)
         return map._repr_html_()
@@ -285,7 +324,7 @@ class AllReviewsAPI(MethodView):
                 'id': review.id,
                 'Rating': review.rating,
                 'Review': review.review,
-                'Reviewed By': review.type,
+                'Type': review.type,
                 'Date': review.date,
                 'Address ID': review.address_id,
                 'Address': {
@@ -296,7 +335,79 @@ class AllReviewsAPI(MethodView):
                 },
             }
             res.append(result)
-        data = {'all reviews': res}
+        data = {'All reviews': res}
+        return jsonify(data)
+
+class FilterByTenantAPI(MethodView):
+    def get(self):
+        all_reviews = Review.query.filter_by(type='tenant')
+        res = []
+        print(all_reviews)
+        for review in all_reviews:
+            result = {
+                'id': review.id,
+                'Rating': review.rating,
+                'Review': review.review,
+                'Type': review.type,
+                'Date': review.date,
+                'Address ID': review.address_id,
+                'Address': {
+                    'id': review.address.id,
+                    'Door Number': review.address.door_num,
+                    'Street': review.address.street,
+                    'Postode': review.address.postcode,
+                },
+            }
+            res.append(result)
+        data = {'Review by Tenants': res}
+        return jsonify(data)
+
+class FilterByNeighbourAPI(MethodView):
+    def get(self):
+        all_reviews = Review.query.filter_by(type='neighbour')
+        res = []
+        count = 0
+        for review in all_reviews:
+            result = {
+                'id': review.id,
+                'Rating': review.rating,
+                'Review': review.review,
+                'Type': review.type,
+                'Date': review.date,
+                'Address ID': review.address_id,
+                'Address': {
+                    'id': review.address.id,
+                    'Door Number': review.address.door_num,
+                    'Street': review.address.street,
+                    'Postode': review.address.postcode,
+                },
+            }
+            res.append(result)
+        data = {'Review by Neighbours': res}
+        return jsonify(data)
+
+class FilterByVistorAPI(MethodView):
+    def get(self):
+        all_reviews = Review.query.filter_by(type='visitor')
+        res = []
+        print(all_reviews)
+        for review in all_reviews:
+            result = {
+                'id': review.id,
+                'Rating': review.rating,
+                'Review': review.review,
+                'Type': review.type,
+                'Date': review.date,
+                'Address ID': review.address_id,
+                'Address': {
+                    'id': review.address.id,
+                    'Door Number': review.address.door_num,
+                    'Street': review.address.street,
+                    'Postode': review.address.postcode,
+                },
+            }
+            res.append(result)
+        data = {'Review by Visitors': res}
         return jsonify(data)
 
 class FilterByRatingAPI(MethodView):
@@ -311,22 +422,23 @@ class FilterByRatingAPI(MethodView):
         res = []
         get_reviews = Review.query.all()
         for review in get_reviews:
-            result = {
-                'id': review.id,
-                'Rating': review.rating,
-                'Review': review.review,
-                'Reviewed By': review.type,
-                'Date': review.date,
-                'Address ID': review.address_id,
-                'Address': {
-                    'id': review.address.id,
-                    'Door Number': review.address.door_num,
-                    'Street': review.address.street,
-                    'Postode': review.address.postcode,
-                },
-            }
-            res.append(result)
-        data = {'Reviews by Door Number': res}
+            if user_rating_request == review.rating:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Type': review.type,
+                    'Date': review.date,
+                    'Address ID': review.address_id,
+                    'Address': {
+                        'id': review.address.id,
+                        'Door Number': review.address.door_num,
+                        'Street': review.address.street,
+                        'Postode': review.address.postcode,
+                    },
+                }
+                res.append(result)
+        data = {'Reviews by Rating': res}
         return jsonify(data)
 
 class FilterByDoorAPI(MethodView):
@@ -347,7 +459,7 @@ class FilterByDoorAPI(MethodView):
                     'id': review.id,
                     'Rating': review.rating,
                     'Review': review.review,
-                    'Reviewed By': review.type,
+                    'Type': review.type,
                     'Date': review.date,
                     'Address ID': review.address_id,
                     'Address': {
@@ -358,7 +470,7 @@ class FilterByDoorAPI(MethodView):
                     },
                 }
                 res.append(result)
-        data = {'search by door number': res}
+        data = {'Reviews by door number': res}
         return jsonify(data)
 
 class FilterByStreetAPI(MethodView):
@@ -378,7 +490,7 @@ class FilterByStreetAPI(MethodView):
                     'id': review.id,
                     'Rating': review.rating,
                     'Review': review.review,
-                    'Reviewed By': review.type,
+                    'Type': review.type,
                     'Date': review.date,
                     'Address ID': review.address_id,
                     'Address': {
@@ -389,7 +501,7 @@ class FilterByStreetAPI(MethodView):
                     },
                 }
                 res.append(result)
-        data = {'search by street': res}
+        data = {'Reviews by street name': res}
         return jsonify(data)
 
 class FilterByLocationAPI(MethodView):
@@ -409,7 +521,7 @@ class FilterByLocationAPI(MethodView):
                     'id': review.id,
                     'Rating': review.rating,
                     'Review': review.review,
-                    'Reviewed By': review.type,
+                    'Type': review.type,
                     'Date': review.date,
                     'Address ID': review.address_id,
                     'Address': {
@@ -420,7 +532,7 @@ class FilterByLocationAPI(MethodView):
                     },
                 }
                 res.append(result)
-        data = {'search by location': res}
+        data = {'Reviews by location': res}
         return jsonify(data)    
 
 class FilterByPostcodeAPI(MethodView):
@@ -440,7 +552,7 @@ class FilterByPostcodeAPI(MethodView):
                     'id': review.id,
                     'Rating': review.rating,
                     'Review': review.review,
-                    'Reviewed By': review.type,
+                    'Type': review.type,
                     'Date': review.date,
                     'Address ID': review.address_id,
                     'Address': {
@@ -451,7 +563,7 @@ class FilterByPostcodeAPI(MethodView):
                     },
                 }
                 res.append(result)
-        data = {'search by postcode': res}
+        data = {'Reviews by postcode': res}
         return jsonify(data)
 
 class UploadAddressAPI(MethodView):
@@ -522,13 +634,16 @@ app.add_url_rule('/reviews/location', view_func=FilterByLocation.as_view(name='f
 app.add_url_rule('/reviews/postcode', view_func=FilterByPostcode.as_view(name='filter_postcode'))
 app.add_url_rule('/trusthouse-map', view_func=TrustHouseMap.as_view(name='trust_house_map'))
 # (get) API routes
-app.add_url_rule('/API/address', view_func=DisplayAllAddressesAPI.as_view(name='display_address_API'))
-app.add_url_rule('/API/reviews', view_func=AllReviewsAPI.as_view(name='review_API'))
-app.add_url_rule('/API/rating/<rating>', view_func=FilterByRatingAPI.as_view(name='filter_rating_API'))
-app.add_url_rule('/API/door/<door>', view_func=FilterByDoorAPI.as_view(name='filter_door_API'))
-app.add_url_rule('/API/street/<street>', view_func=FilterByStreetAPI.as_view(name='filter_street_API'))
-app.add_url_rule('/API/location/<location>', view_func=FilterByLocationAPI.as_view(name='filter_location_API'))
-app.add_url_rule('/API/postcode/<postcode>', view_func=FilterByPostcodeAPI.as_view(name='filter_postcode_API'))
+app.add_url_rule('/api/address', view_func=DisplayAllAddressesAPI.as_view(name='display_address_API'))
+app.add_url_rule('/api/reviews', view_func=AllReviewsAPI.as_view(name='review_API'))
+app.add_url_rule('/api/tenant', view_func=FilterByTenantAPI.as_view(name='filter_tenant_API'))
+app.add_url_rule('/api/neighbour', view_func=FilterByNeighbourAPI.as_view(name='filter_neighbour_API'))
+app.add_url_rule('/api/visitor', view_func=FilterByVistorAPI.as_view(name='filter_visitor_API'))
+app.add_url_rule('/api/rating/<rating>', view_func=FilterByRatingAPI.as_view(name='filter_rating_API'))
+app.add_url_rule('/api/door/<door>', view_func=FilterByDoorAPI.as_view(name='filter_door_API'))
+app.add_url_rule('/api/street/<street>', view_func=FilterByStreetAPI.as_view(name='filter_street_API'))
+app.add_url_rule('/api/location/<location>', view_func=FilterByLocationAPI.as_view(name='filter_location_API'))
+app.add_url_rule('/api/postcode/<postcode>', view_func=FilterByPostcodeAPI.as_view(name='filter_postcode_API'))
 # (post) API route
 app.add_url_rule('/createAddress', view_func=UploadAddressAPI.as_view(name='upload_address'))
 

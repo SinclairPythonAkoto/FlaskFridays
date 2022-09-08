@@ -121,31 +121,7 @@ class WriteReview(MethodView):
                 message = 'Your review has been uploaded!'
                 return render_template('writeReviewPage.html', message=message)
         else:
-            if door == get_door_num[0].door_num and postcode == get_postcode[0].postcode:
-                if len(get_review_content) != 0:
-                    new_review = Review(
-                        rating=review_rating,
-                        review=review_text,
-                        type=review_type,
-                        date=datetime.now(),
-                        address=get_postcode[0],
-                    )
-                    db.session.add(new_review)
-                    db.session.commit()
-                    message = 'A new review has been added to an existing postcode.'
-                    return render_template('writeReviewPage.html', message=message)
-                new_review = Review(
-                    rating=review_rating,
-                    review=review_text,
-                    type=review_type,
-                    date=datetime.now(),
-                    address=get_postcode[0],
-                )
-                db.session.add(new_review)
-                db.session.commit()
-                message = 'A new review has been added'
-                return render_template('writeReviewPage.html', message=message)
-            else:
+            if not get_door_num and postcode == get_postcode[0].postcode:
                 new_address = Address(
                     door_num=door.lower(),
                     street=street_name.lower(),
@@ -177,6 +153,31 @@ class WriteReview(MethodView):
                     db.session.add(new_review)
                     db.session.commit()
                     message = 'Your review has been uploaded!'
+                    return render_template('writeReviewPage.html', message=message)
+            else:
+                if door == get_door_num[0].door_num and postcode == get_postcode[0].postcode:
+                    if len(get_review_content) != 0:
+                        new_review = Review(
+                            rating=review_rating,
+                            review=review_text,
+                            type=review_type,
+                            date=datetime.now(),
+                            address=get_postcode[0],
+                        )
+                        db.session.add(new_review)
+                        db.session.commit()
+                        message = 'A new review has been added to an existing postcode.'
+                        return render_template('writeReviewPage.html', message=message)
+                    new_review = Review(
+                        rating=review_rating,
+                        review=review_text,
+                        type=review_type,
+                        date=datetime.now(),
+                        address=get_postcode[0],
+                    )
+                    db.session.add(new_review)
+                    db.session.commit()
+                    message = 'A new review has been added'
                     return render_template('writeReviewPage.html', message=message)
                 
 

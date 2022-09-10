@@ -8,4 +8,9 @@ class LandingPage(MethodView):
         return render_template('landingPage.html')
 
 
-app.add_url_rule('/', view_func=LandingPage.as_view(name='landingpage'))
+app.add_url_rule(
+    '/',
+    view_func=LandingPage.as_view(
+        name='landingpage'
+    ),
+)

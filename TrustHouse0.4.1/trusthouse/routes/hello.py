@@ -1,5 +1,5 @@
 from flask.views import MethodView
-from ..extension import app
+from ..extensions import app
 
 
 class HelloWorld(MethodView):

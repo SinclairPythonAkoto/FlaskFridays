@@ -7,3 +7,4 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///trusthouse.sqlite3"
 app.config["TRACK_MODIFICATIONS"] = True
 
 import trusthouse.routes.hello
+import trusthouse.routes.welcome_screen

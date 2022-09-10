@@ -7,4 +7,4 @@ class HelloWorld(MethodView):
         return 'Hello world!'
 
 
-app.add_url_rule('/', view_func=HelloWorld.as_view(name='hello_world'))
+app.add_url_rule('/hello', view_func=HelloWorld.as_view(name='hello_world'))

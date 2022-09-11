@@ -13,6 +13,6 @@ class DisplayListedLocations(MethodView):
 app.add_url_rule(
     '/reviews/all/location',
     view_func=DisplayListedLocations.as_view(
-        name='listed_locatoins'
+        name='listed_locations'
     )
 )

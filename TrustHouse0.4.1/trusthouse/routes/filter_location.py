@@ -25,6 +25,6 @@ class FilterByLocation(MethodView):
 app.add_url_rule(
     '/reviews/location',
     view_func=FilterByLocation.as_view(
-        name='filter_loaction'
+        name='filter_location'
     ),
 )

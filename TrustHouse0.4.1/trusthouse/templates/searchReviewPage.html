@@ -27,7 +27,7 @@
     <h1 class="container">Trust House Search Engine</h1>
     <br><br><br>
     <div >
-    <form action="{{ url_for('filter_ratings') }}" method="post" class="container" style="border-right: 5px solid red;">
+    <form action="{{ url_for('filter_rating') }}" method="post" class="container" style="border-right: 5px solid red;">
         <label for="searchRating">Find Review by Rating: </label><br>
         <input type="number" name="searchRating" id="searchRating" placeholder="Enter a rating from 1 - 5" required>
         <button type="submit" class="btn">Find Reviews</button>

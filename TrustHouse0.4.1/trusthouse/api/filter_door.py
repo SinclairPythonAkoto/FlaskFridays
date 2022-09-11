@@ -12,7 +12,9 @@ class FilterByDoorAPI(MethodView):
             db.session.query(Address).filter_by(door_num=user_door_request).exists()
         ).scalar()
         if check_val == False:
-            void = {'void': 'no match found'}
+            void = 'Error'
+            message = 'No match found'
+            data = {void:message}
             return jsonify(void)
         res = []
         get_reviews = Review.query.all()
@@ -34,7 +36,12 @@ class FilterByDoorAPI(MethodView):
                     },
                 }
                 res.append(result)
-        data = {'Reviews by door number': res}
+        success = 'Successful upload'
+        message = 'Your address has been uploaded to Trust House.'
+        data = {
+            success:message,
+            'Reviews by door number': res
+        }
         return jsonify(data)
 
 

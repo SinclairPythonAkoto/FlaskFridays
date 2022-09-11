@@ -1,5 +1,6 @@
 # Trust House v. 0.3 #
 
+
 In this version I will include map the postcodes to a map I will create using `Folium`.
 
 For this to work the way I intend, I will create another table for the longitude & latitude - and give it a *one to one* relationship between the `Address` table and the `Maps` table.
@@ -10,6 +11,7 @@ For each point plotted on the map, I will include information of the address - i
 
 For my next step I will need to calculate the length of the reviews and then add it to the associated address.
 The `Address` table will have an additional column - `total reviews`.
+
 
 ### One to One Relationship ###
 I created a *One to One* relationship between the `Address` table & the `Maps` table so when we create a new address, the coordinate of the postcode is also stored.
@@ -36,6 +38,7 @@ By setting `backref` to `'location'` we are telling Python that we want to acces
 Now we need to add `uselist=False`, to let Python, know that in this relationship we do not want to create a list - *so essentially telling Python that we just want one instance stored in this relationship*.
 Finally, to make it all work we need to create a variable in the `Maps` table that will link the coordinates stored to the address in the `Address` table.
 We do this by creating a `ForeignKey` and place the `address.id` inside the brackets.  ***The reference to the class & id you are relating to needs to be in lowercase. ***
+
 
 ### One to Many Relationship ###
 ```
@@ -64,6 +67,7 @@ If we look closely at our `reviews` variable within the `Address` table, we can 
 Again, to create the link between the two I will need a `ForeignKey` that will be linked to the `address.id`.
 
 I found this way of navigating through the data extremely helpful as it enables me to split up the data obtained and use it dynamically for when producing the results on the map or returning a JSON response.
+
 
 ### Creating a Map ###
 To create the map, I used the `Folium` library - which I installed in my virtual environment.
@@ -110,9 +114,11 @@ To be able to show the map as a webpage for the class route I had to execute the
 return map._repr_html()
 ```
 
+
 # Trust House v 0.4 #
 In this version I will refactor the codebase with **Flask Blueprint**.
 ***This app is incomplete.***
+
 
 # Trust House v. 0.4.1 #
 In this version I will be refactoring the web app and split it up in a modular layout.  
@@ -121,6 +127,7 @@ I will also attempt to reduce the amount of repetition used throughout the codeb
 By combining the [*Flask Documentation*](https://flask.palletsprojects.com/en/2.0.x/patterns/appfactories/) on application factories and tutorial by [*Pretty Printed*](https://www.youtube.com/watch?v=WhwU1-DLeVw&t=989s), I was able to reorganise my Flask app.
 This allowed me to separate distinct parts of the web app into separate modules, each with separate functionalities, working together to make the app run.
 I decided to split the database tables into a module called `models` and created more modules for the web routes & API responses.
+
 
 ### Refactoring: Monolith to Modular ###
 To make my refactoring successful, I had to create an `__init__.py` file for every module.
@@ -155,6 +162,7 @@ As mentioned before, we can see that `welcome_screen.py` depends on the `trustho
 *This is a ***Circular Import***; circular imports are advised to be avoided as it can cause problems with your code in your app.*
 *However, for my scenario, because I want to have the possibility to easily extend my app, I will use this design pattern as recommended by the Flask documentation. *
 
+
 ### Setup.py ##
 If we try to run our file now you will see it will not work.
 This is because Python is *stopping us from setting up a module as a start-up file*.
@@ -172,6 +180,7 @@ setup(
 )
 ```
 The app is not yet ready to run, I will build the database tables first then go through the final steps of running the app. 
+
 
 ### Setting Up the Database Tables ###
 To set up the database tables I created the `models` module, then made each database table a separate Python file.  
@@ -210,6 +219,101 @@ from trusthouse.models import *
 db.init_app(app)
 db.create_all(app=app)
 ```
+
+
+### Creating the Trust House API ###
+I wanted to create a backend service for this map, to allow a buisness-to-buisness collaberation with others.
+The idea is to create an opportunity for buisness owners and other developers to utilise the **Trust House API** directly from the website, or as a third party within their own apps/systems.
+
+To do this successfully, I had to query the part of the database I wanted, then return the result in a dictionary before converting it into a JSON format.
+This here is a good example of why a *One to Many* relationship becomes usefull - it allows me to get access to data from the `Address` table while using a `Review` class object.
+Let's see how this looks like in `filter_door.py`.
+```
+class FilterByDoorAPI(MethodView):
+    def get(self, door):
+        user_door_request = door
+        check_val = db.session.query(
+            db.session.query(Address).filter_by(door_num=user_door_request).exists()
+        ).scalar()
+        if check_val == False:
+            void = 'Error'
+            message = 'No match found'
+            data = {void:message}
+            return jsonify(void)
+        res = []
+        get_reviews = Review.query.all()
+        for review in get_reviews:
+            if user_door_request == review.address.door_num:
+                result = {
+                    'id': review.id,
+                    'Rating': review.rating,
+                    'Review': review.review,
+                    'Type': review.type,
+                    'Date': review.date,
+                    'Address ID': review.address_id,
+                    'Address': {
+                        'id': review.address.id,
+                        'Door Number': review.address.door_num,
+                        'Street': review.address.street,
+                        'Postode': review.address.postcode,
+                    },
+                }
+                res.append(result)
+        success = 'Successful upload'
+        message = 'Your address has been uploaded to Trust House.'
+        data = {
+            success:message,
+            'Reviews by door number': res
+        }
+        return jsonify(data)
+```
+First I check if the door number the user has given us exists in the database.
+```
+user_door_request = door
+        check_val = db.session.query(
+            db.session.query(Address).filter_by(door_num=user_door_request).exists()
+        ).scalar()
+```
+This returns a `True` or `False` value; so this is very good when checking if the data you want is in the database.
+***A good idea would be to change this into a separate function when refactoring the code.***
+If the data exists, I then query the `Review` table and check if the user's request matches the door number we have in the database.
+```
+get_reviews = Review.query.all()
+        for review in get_reviews:
+            if user_door_request == review.address.door_num:
+```
+By using `.address` attribute on the `review` variable, I am able to gain access to the variables address - like the `door_num`.
+As the for loop iterates through the table, I append each result in the `res` variable *(I hate the name - it won't be there when I refactor!)*; then I create a dictonary with all the information inside. 
+This is then easy for me to convert to a JSON format before returning it to the user.
+If the `user_door_request` doesn't exist then I create an error message within a dictonary and convert it into a JSON format, before returning it back to the user.
+
+
+### New Address API ###
+For this API I wanted to enable the possiblity for users to create and upload their own address into the Trust House database.  
+This would be then relayed on the map for users to see.
+I thought this would be good for letting agencies, businesses and landlords.
+The logic is almost identical to the `create_review.py`; while `create_review.py` is a post request, `new_address.py` is however a get request!
+Bceause `create_review.py` is a large file I will only show a snippet but feel free to check out the full code.
+```
+class NewAddressAPI(MethodView):
+    def get(self, address_door_num, address_street_name, address_location, address_postcode):
+        # address data
+        door = address_door_num
+        street_name = address_street_name
+        town_city = address_location
+        postcode = address_postcode
+```
+Here I have created the variables that the user will pass through the web browser, and then use them query the data base as well as other functions.
+```
+app.add_url_rule(
+    '/api/new-address/<address_door_num>,<address_street_name>,<address_location>,<address_postcode>',
+    view_func=NewAddressAPI.as_view(
+        name='create_new_address'
+    ),
+)
+```
+Here is where I create the variables and also *the layout*.
+The user must follow the same index as above otherwise the user will end up having ***data in thr wrong columns***, which would give the user unintended results.
 
 
 ### Run the App ###

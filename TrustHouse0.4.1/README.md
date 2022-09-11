@@ -347,4 +347,7 @@ pip install gunicorn
 - Include functionality to include pictures - how to save more than one pic
 - Save pictures in db and display back to user
 - May need to do a **Many to Many** relationship between `Review` table and `Pictures` table.
+- Include functionality for users to upload thier buisness address details to be displayed on the map (part of self local advertisement)
+- Build a business directory
+- Create a drop down selection for users to search reviews by tenant, neighbours, vistors.
 

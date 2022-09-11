@@ -1,6 +1,6 @@
-from flask import render_template
 from flask.views import MethodView
 from trusthouse.models.review import Review
+from flask import render_template
 from ..extensions import app
 
 

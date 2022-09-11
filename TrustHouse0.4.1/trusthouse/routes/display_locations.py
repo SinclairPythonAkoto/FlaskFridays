@@ -1,6 +1,6 @@
-from flask import render_template
 from flask.views import MethodView
 from trusthouse.models.address import Address
+from flask import render_template
 from ..extensions import app
 
 

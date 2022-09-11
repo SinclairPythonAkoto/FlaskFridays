@@ -1,5 +1,5 @@
-from flask import render_template
 from flask.views import MethodView
+from flask import render_template
 from ..extensions import app
 
 

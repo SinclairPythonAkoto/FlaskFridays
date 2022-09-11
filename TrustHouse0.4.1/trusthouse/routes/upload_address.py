@@ -1,6 +1,6 @@
-from flask import render_template, request
 from flask.views import MethodView
 from trusthouse.models.address import Address
+from flask import render_template, request
 from ..extensions import app, db
 
 

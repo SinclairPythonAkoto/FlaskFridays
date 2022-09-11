@@ -110,6 +110,10 @@ To be able to show the map as a webpage for the class route I had to execute the
 return map._repr_html()
 ```
 
+# Trust House v 0.4 #
+In this version I will refactor the codebase with **Flask Blueprint**.
+***This app is incomplete.***
+
 # Trust House v. 0.4.1 #
 In this version I will be refactoring the web app and split it up in a modular layout.  
 I will also attempt to reduce the amount of repetition used throughout the codebase.

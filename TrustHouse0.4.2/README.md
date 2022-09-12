@@ -323,6 +323,7 @@ In most cases, the need to refactor will be due to the coe being repeated across
 Most of the refactoring will be changing repetative tasks *(like checking if a value exists in the database)* into functions.
 
 
+
 ### Run the App ###
 Now we have successfully created the database tables we can *install* our app to be able to run it with `flask --app`.
 
@@ -350,7 +351,6 @@ pip install gunicorn
 
 
 #### The Next Update(s) ####
-- Reduce repetitive code, use functions instead
 - Include functionality to include pictures - how to save more than one pic
 - Save pictures in db and display back to user
 - May need to do a **Many to Many** relationship between `Review` table and `Pictures` table.

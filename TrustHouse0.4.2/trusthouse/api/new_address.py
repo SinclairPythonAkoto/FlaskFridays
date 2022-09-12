@@ -1,6 +1,8 @@
 import requests
 from flask.views import MethodView
 from trusthouse.models.address import Address
+from trusthouse.utils.get_coordinates import get_postcode_coordinates
+from trusthouse.utils.request_messages import warning_message, error_message, ok_message
 from flask import jsonify
 from ..extensions import app, db
 
@@ -29,25 +31,29 @@ class NewAddressAPI(MethodView):
             db.session.add(new_address)
             db.session.commit()
             # get latitude & logitude from user postcode
-            response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")
-            data = response.json()
+            user_postcode_coordinates = get_postcode_coordinates(postcode)
+
             # if there is an existing latitude & longitude
-            if data == None:
+            if user_postcode_coordinates == None:
                 # creating the json response for just address, no coordinates
-                warning = 'Warning'
-                message = 'Your address has been uploaded to Trust House, but the coordinates to your postcode could not be saved.'
-                data = {warning:message}
+                data = {
+                    'Incomplete upload': warning_message()[0],
+                    'Status': warning_message()[1]
+                }
                 return jsonify(data)
-            elif data != None:
+            elif user_postcode_coordinates != None:
                 # creating the json response
-                success = 'Successful upload'
-                message = 'Your address has been uploaded to Trust House.'
-                data = {success: message}
+                data = {
+                    'Successful upload': ok_message()[0],
+                    'Status': ok_message()[2],
+                }
                 return jsonify(data)
             else:
                 void = 'Error'
                 message = 'Something went wrong, please check & try again'
-                data = {void:message}
+                data = {
+                    'Unexpected '
+                }
                 return jsonify(data)
         else:
             if not get_door_num and postcode == get_postcode[0].postcode:
@@ -62,7 +68,7 @@ class NewAddressAPI(MethodView):
                 response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")
                 data = response.json()
                 # if there is an existing latitude & longitude
-                if data != None:
+                if user_postcode_coordinates != None:
                     success = 'Successful upload'
                     message = 'Your address has been uploaded to Trust House.'
                     data = {success: message}

@@ -1,10 +1,10 @@
-import requests
-from datetime import datetime
 from flask.views import MethodView
 from trusthouse.models.address import Address
 from trusthouse.models.maps import Maps
-from trusthouse.models.review import Review
-from trusthouse.utils.create_address import create_new_address
+from trusthouse.utils.validate_postcode import validate_postcode_request
+from trusthouse.utils.validate_door import validate_door_request
+from trusthouse.utils.get_coordinates import get_postcode_coordinates
+from trusthouse.utils.request_messages import warning_message, error_message, ok_message
 from flask import render_template, request, jsonify
 from ..extensions import app, db
 
@@ -20,32 +20,36 @@ class UploadAddress(MethodView):
         postcode = request.form['addressPostcode']
 
         # get data to check if new review already exists
-        get_door_num = Address.query.filter_by(door_num=door).all()
-        get_postcode = Address.query.filter_by(postcode=postcode).all()
+        # get_door_num = Address.query.filter_by(door_num=door).all()
+        # get_postcode = Address.query.filter_by(postcode=postcode).all()
 
-        BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
-
-        if len(get_postcode) == 0:
+        # use the validation functions to check if door & postcode match or not 
+        door_request = validate_door_request(door)
+        postcode_request = validate_postcode_request(postcode)
+        # if there is no preexisting postcode create new address.
+        if postcode_request == False:
             # write fuction
-            create_new_address(
-                door.lower(),
-                street_name.lower(),
-                location.lower(),
-                postcode.lower(),
+            new_address = Address(
+                door_num=door.lower(),
+                street=street_name.lower(),
+                location=location.lower(),
+                postcode=postcode.lower(),
             )
+            db.session.add(new_address)
+            db.session.commit()
             # write fuction
-            response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")
-            data = response.json()
+            user_postcode_coordinates = get_postcode_coordinates(postcode)
             # write fuction
-            if data == []:
+            if user_postcode_coordinates == None:
                 # write fuction
-                warning = 'Warning'
-                message = 'Your address has been uploaded to Trust House, but the coordinates to your postcode could not be saved.'
-                data = {warning:message}
+                data = {
+                    'Incomplete upload': warning_message()[0], 
+                    'Status':warning_message()[1]
+                }
                 return jsonify(data)
-            elif data != []:
-                latitude = data[0].get('lat')
-                longitude = data[0].get('lon')
+            elif user_postcode_coordinates != None:
+                latitude = user_postcode_coordinates[0].get('lat')
+                longitude = user_postcode_coordinates[0].get('lon')
                 new_geo_map = Maps(
                     lon=longitude,
                     lat=latitude,
@@ -53,15 +57,16 @@ class UploadAddress(MethodView):
                 )
                 db.session.add(new_geo_map)
                 db.session.commit()
-                message = 'Your address has been uploaded to Trust House.'
+                message = ok_message()[0]['Success']
                 return render_template('newAddress.html', message=message)
             else:
-                void = 'Error'
-                message = 'Something went wrong, please check & try again'
-                data = {void:message}
+                data = {
+                    'Unexpecte error': error_message()[0],
+                    'status': error_message()[0], 
+                }
                 return jsonify(data)
         else:
-            if not get_door_num and postcode == get_postcode[0].postcode:
+            if door_request == False and postcode_request == True:
                 new_address = Address(
                     door_num=door.lower(),
                     street=street_name.lower(),
@@ -70,12 +75,11 @@ class UploadAddress(MethodView):
                 )
                 db.session.add(new_address)
                 db.session.commit()
-                response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")
-                data = response.json()
+                user_postcode_coordinates = get_postcode_coordinates(postcode)
                 # if there is an existing latitude & longitude
-                if data[0]:
-                    latitude = data[0].get('lat')
-                    longitude = data[0].get('lon')
+                if user_postcode_coordinates:
+                    latitude = user_postcode_coordinates[0].get('lat')
+                    longitude = user_postcode_coordinates[0].get('lon')
                     new_geo_map = Maps(
                         lon=longitude,
                         lat=latitude,
@@ -83,7 +87,7 @@ class UploadAddress(MethodView):
                     )
                     db.session.add(new_geo_map)
                     db.session.commit()
-                    message = 'Your review has been uploaded!'
+                    message = ok_message()[0]['Success']
                     return render_template('newAddress.html', message=message)
 
 

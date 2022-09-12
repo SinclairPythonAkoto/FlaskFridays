@@ -19,10 +19,6 @@ class UploadAddress(MethodView):
         location = request.form['addressLocation']
         postcode = request.form['addressPostcode']
 
-        # get data to check if new review already exists
-        # get_door_num = Address.query.filter_by(door_num=door).all()
-        # get_postcode = Address.query.filter_by(postcode=postcode).all()
-
         # use the validation functions to check if door & postcode match or not 
         door_request = validate_door_request(door)
         postcode_request = validate_postcode_request(postcode)
@@ -40,7 +36,7 @@ class UploadAddress(MethodView):
                     'Status':warning_message()[1]
                 }
                 return jsonify(data)
-            elif user_postcode_coordinates != []:
+            elif user_postcode_coordinates:
                 latitude = user_postcode_coordinates[0].get('lat')
                 longitude = user_postcode_coordinates[0].get('lon')
                 create_new_map(longitude, latitude, new_address)

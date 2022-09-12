@@ -1,11 +1,13 @@
-import requests
-from datetime import datetime
 from flask.views import MethodView
-from trusthouse.models.address import Address
-from trusthouse.models.maps import Maps
-from trusthouse.models.review import Review
+from trusthouse.utils.validate_door import validate_door_request
+from trusthouse.utils.validate_postcode import validate_postcode_request
+from trusthouse.utils.create_address import create_new_address
+from trusthouse.utils.get_coordinates import get_postcode_coordinates
+from trusthouse.utils.create_map import create_new_map
+from trusthouse.utils.create_review import create_new_review
+from trusthouse.utils.request_messages import error_message, ok_message
 from flask import render_template, request
-from ..extensions import app, db
+from ..extensions import app
 
 
 class WriteReview(MethodView):
@@ -25,117 +27,45 @@ class WriteReview(MethodView):
         review_type = request.form['selection']
 
         # get data to check if new review already exists
-        get_door_num = Address.query.filter_by(door_num=door).all()
-        get_postcode = Address.query.filter_by(postcode=postcode).all()
-        get_review_content = Review.query.filter_by(review=review_text).all()
+        check_door = validate_door_request(door)
+        check_postcode = validate_postcode_request(postcode)
 
-        BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json'
-
-        if len(get_postcode) == 0:
-            new_address = Address(
-                door_num=door.lower(),
-                street=street_name.lower(),
-                location=town_city.lower(),
-                postcode=postcode.lower(),
+        if check_postcode == False:
+            new_address = create_new_address(
+                door.lower(),
+                street_name.lower(),
+                town_city.lower(),
+                postcode.lower(),
             )
-            db.session.add(new_address)
-            db.session.commit()
             # get latitude & logitude from user postcode
-            response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")
-            data = response.json()
+            user_postcode_coordinates = get_postcode_coordinates(postcode)
             # if there is an existing latitude & longitude
-            if data[0]:
-                latitude = data[0].get('lat')
-                longitude = data[0].get('lon')
-                new_geo_map = Maps(
-                    lon=longitude,
-                    lat=latitude,
-                    location=new_address,
-                )
-                db.session.add(new_geo_map)
-                db.session.commit()
-                new_review = Review(
-                    rating=review_rating,
-                    review=review_text,
-                    type=review_type,
-                    date=datetime.now(),
-                    address=new_address,
-                )
-                db.session.add(new_review)
-                db.session.commit()
-                message = 'Your review has been uploaded!'
+            if user_postcode_coordinates == []:
+                latitude = user_postcode_coordinates[0].get('lat')
+                longitude = user_postcode_coordinates[0].get('lon')
+                create_new_map(longitude, latitude, new_address)
+                message = ok_message()[1]['Success']
+                return render_template('writeReviewPage.html', message=message)
+            elif user_postcode_coordinates:
+                create_new_review(review_rating, review_text, review_type, new_address)
+                message = ok_message()[1]['Success']
                 return render_template('writeReviewPage.html', message=message)
             else:
-                new_review = Review(
-                    rating=review_rating,
-                    review=review_text,
-                    type=review_type,
-                    date=datetime.now(),
-                    address=new_address,
-                )
-                db.session.add(new_review)
-                db.session.commit()
-                message = 'Your review has been uploaded!'
+                message = error_message()[0]['Error']
                 return render_template('writeReviewPage.html', message=message)
         else:
-            if not get_door_num and postcode == get_postcode[0].postcode:
-                new_address = Address(
-                    door_num=door.lower(),
-                    street=street_name.lower(),
-                    location=town_city.lower(),
-                    postcode=postcode.lower(),
+            if check_door == False and check_postcode == True:
+                new_address = create_new_address(
+                    door.lower(),
+                    street_name.lower(),
+                    town_city.lower(),
+                    postcode.lower(),
                 )
-                db.session.add(new_address)
-                db.session.commit()
-                response = requests.get(f"{BASE_URL}&postalcode={postcode}&country=united kingdom")
-                data = response.json()
-                # if there is an existing latitude & longitude
-                if data[0]:
-                    latitude = data[0].get('lat')
-                    longitude = data[0].get('lon')
-                    new_geo_map = Maps(
-                        lon=longitude,
-                        lat=latitude,
-                        location=new_address,
-                    )
-                    db.session.add(new_geo_map)
-                    db.session.commit()
-                    new_review = Review(
-                        rating=review_rating,
-                        review=review_text,
-                        type=review_type,
-                        date=datetime.now(),
-                        address=new_address,
-                    )
-                    db.session.add(new_review)
-                    db.session.commit()
-                    message = 'Your review has been uploaded!'
-                    return render_template('writeReviewPage.html', message=message)
-            else:
-                if door == get_door_num[0].door_num and postcode == get_postcode[0].postcode:
-                    if len(get_review_content) != 0:
-                        new_review = Review(
-                            rating=review_rating,
-                            review=review_text,
-                            type=review_type,
-                            date=datetime.now(),
-                            address=get_postcode[0],
-                        )
-                        db.session.add(new_review)
-                        db.session.commit()
-                        message = 'A new review has been added to an existing postcode.'
-                        return render_template('writeReviewPage.html', message=message)
-                    new_review = Review(
-                        rating=review_rating,
-                        review=review_text,
-                        type=review_type,
-                        date=datetime.now(),
-                        address=get_postcode[0],
-                    )
-                    db.session.add(new_review)
-                    db.session.commit()
-                    message = 'A new review has been added'
-                    return render_template('writeReviewPage.html', message=message)
+                user_postcode_coordinates = get_postcode_coordinates(postcode)
+                create_new_review(review_rating, review_text, review_type, new_address)
+                message = ok_message()[1]['Success']
+                return render_template('writeReviewPage.html', message=message)
+                
     
 
 app.add_url_rule(

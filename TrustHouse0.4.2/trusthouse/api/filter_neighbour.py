@@ -1,5 +1,6 @@
 from flask.views import MethodView
 from trusthouse.models.review import Review
+from trusthouse.utils.request_messages import ok_message
 from flask import jsonify
 from ..extensions import app
 
@@ -7,8 +8,7 @@ from ..extensions import app
 class FilterByNeighbourAPI(MethodView):
     def get(self):
         all_reviews = Review.query.filter_by(type='neighbour')
-        res = []
-        count = 0
+        neighbour_results = []
         for review in all_reviews:
             result = {
                 'id': review.id,
@@ -24,8 +24,12 @@ class FilterByNeighbourAPI(MethodView):
                     'Postode': review.address.postcode,
                 },
             }
-            res.append(result)
-        data = {'Review by Neighbours': res}
+            neighbour_results.append(result)
+        data = {
+            'Search by neighbour': ok_message()[2],
+            'Reviews by neighbours': neighbour_results,
+            'Status': ok_message()[3],
+        }
         return jsonify(data)
 
 

@@ -1,5 +1,6 @@
 from flask.views import MethodView
 from trusthouse.models.review import Review
+from trusthouse.utils.request_messages import error_message, ok_message
 from trusthouse.utils.validate_rating import validate_rating_request
 from flask import jsonify
 from ..extensions import app, db
@@ -10,9 +11,12 @@ class FilterByRatingAPI(MethodView):
         user_rating_request = int(rating)
         response = validate_rating_request(user_rating_request)
         if response == False:
-            void = {'Void': 'No match found'}
-            return jsonify(void)
-        res = []
+            data = {
+                'Search by review rating': error_message()[1],
+                'Status': error_message()[2],
+            }
+            return jsonify(data)
+        user_rating_result = []
         get_reviews = Review.query.all()
         for review in get_reviews:
             if user_rating_request == review.rating:
@@ -30,8 +34,12 @@ class FilterByRatingAPI(MethodView):
                         'Postode': review.address.postcode,
                     },
                 }
-                res.append(result)
-        data = {'Reviews by Rating': res}
+                user_rating_result.append(result)
+        data = {
+            'Search by review rating': ok_message()[2],
+            'Reviews by rating': user_rating_result,
+            'Status': ok_message()[3],
+        }
         return jsonify(data)
 
 

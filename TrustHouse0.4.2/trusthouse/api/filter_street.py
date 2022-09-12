@@ -1,6 +1,7 @@
 from flask.views import MethodView
 from trusthouse.models.review import Review
 from trusthouse.utils.validate_street import validate_street_request
+from trusthouse.utils.request_messages import error_message, ok_message
 from flask import jsonify
 from ..extensions import app
 
@@ -10,9 +11,12 @@ class FilterByStreetAPI(MethodView):
         user_street_request = street
         response = validate_street_request(user_street_request)
         if response == False:
-            void = {'void': 'no match found'}
+            void = {
+                'Search by street name': error_message()[1],
+                'Status': error_message()[2],
+            }
             return jsonify(void)
-        res = []
+        user_street_restult = []
         get_reviews = Review.query.all()
         for review in get_reviews:
             if user_street_request == review.address.street:
@@ -30,8 +34,12 @@ class FilterByStreetAPI(MethodView):
                         'Postode': review.address.postcode,
                     },
                 }
-                res.append(result)
-        data = {'Reviews by street name': res}
+                user_street_restult.append(result)
+        data = {
+            'Search by street name': ok_message()[2],
+            'Reviews by street name': user_street_restult,
+            'Status': ok_message()[3],
+        }
         return jsonify(data)
 
 

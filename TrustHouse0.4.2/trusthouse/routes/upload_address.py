@@ -33,7 +33,7 @@ class UploadAddress(MethodView):
                 # write fuction
                 data = {
                     'Incomplete upload': warning_message()[0], 
-                    'Status':warning_message()[1]
+                    'Status':warning_message()[2]
                 }
                 return jsonify(data)
             elif user_postcode_coordinates:

@@ -1,6 +1,7 @@
 from flask.views import MethodView
 from trusthouse.models.review import Review
 from trusthouse.utils.validate_postcode import validate_postcode_request
+from trusthouse.utils.request_messages import ok_message, error_message
 from flask import jsonify
 from ..extensions import app
 
@@ -10,9 +11,12 @@ class FilterByPostcodeAPI(MethodView):
         user_postcode_request = postcode
         response = validate_postcode_request(user_postcode_request)
         if response == False:
-            void = {'void': 'no match found'}
-            return jsonify(void)
-        res = []
+            data = {
+                'Search by postcode': error_message()[1],
+                'Status': error_message()[2],
+            }
+            return jsonify(data)
+        user_postcode_result = []
         get_reviews = Review.query.all()
         for review in get_reviews:
             if user_postcode_request == review.address.postcode:
@@ -30,12 +34,16 @@ class FilterByPostcodeAPI(MethodView):
                         'Postode': review.address.postcode,
                     },
                 }
-                res.append(result)
-        data = {'Reviews by postcode': res}
+                user_postcode_result.append(result)
+        data = {
+            'Search by postcode': ok_message()[2],
+            'Reviews by postcode': user_postcode_result,
+            'Status': ok_message()[3],
+        }
         return jsonify(data)
 
 app.add_url_rule(
-    '/api/postocde/<postcode>',
+    '/api/postcode/<postcode>',
     view_func=FilterByPostcodeAPI.as_view(
         name='filter_postcode_API'
     )

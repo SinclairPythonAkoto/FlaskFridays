@@ -49,10 +49,9 @@ class NewAddressAPI(MethodView):
                 }
                 return jsonify(data)
             else:
-                void = 'Error'
-                message = 'Something went wrong, please check & try again'
                 data = {
-                    'Unexpected '
+                'Search by door number': error_message()[0],
+                'Status': error_message()[3],
                 }
                 return jsonify(data)
         else:
@@ -69,9 +68,10 @@ class NewAddressAPI(MethodView):
                 data = response.json()
                 # if there is an existing latitude & longitude
                 if user_postcode_coordinates != None:
-                    success = 'Successful upload'
-                    message = 'Your address has been uploaded to Trust House.'
-                    data = {success: message}
+                    data = {
+                        'Add new address': ok_message()[0]['Success'],
+                        'Status': ok_message()[3]
+                    }
                     return jsonify(data)
             else:
                 if door == get_door_num[0].door_num and postcode == get_postcode[0].postcode:

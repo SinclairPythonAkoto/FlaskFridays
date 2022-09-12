@@ -4,14 +4,16 @@ from ..extensions import db
 
 def create_new_address(door, street, location, postcode):
     """
-    Creates a new address, storing it in the Address table
+    Creates a new address entry, storing it in the Address table
+
+    Resturns the Address object after saving it.
     """
-    new_address = Address(
+    new_address_entry = Address(
                 door_num=door.lower(),
                 street=street.lower(),
                 location=location.lower(),
                 postcode=postcode.lower(),
             )
-    db.session.add(new_address)
+    db.session.add(new_address_entry)
     db.session.commit()
-    return new_address
+    return new_address_entry

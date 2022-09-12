@@ -1,13 +1,12 @@
 from flask.views import MethodView
-from trusthouse.models.address import Address
-from trusthouse.models.maps import Maps
 from trusthouse.utils.validate_postcode import validate_postcode_request
 from trusthouse.utils.validate_door import validate_door_request
 from trusthouse.utils.get_coordinates import get_postcode_coordinates
 from trusthouse.utils.create_address import create_new_address
+from trusthouse.utils.create_map import create_new_map
 from trusthouse.utils.request_messages import warning_message, error_message, ok_message
 from flask import render_template, request, jsonify
-from ..extensions import app, db
+from ..extensions import app
 
 
 class UploadAddress(MethodView):
@@ -42,16 +41,9 @@ class UploadAddress(MethodView):
                 }
                 return jsonify(data)
             elif user_postcode_coordinates != []:
-                print(user_postcode_coordinates)
                 latitude = user_postcode_coordinates[0].get('lat')
                 longitude = user_postcode_coordinates[0].get('lon')
-                new_geo_map = Maps(
-                    lon=longitude,
-                    lat=latitude,
-                    location=new_address,
-                )
-                db.session.add(new_geo_map)
-                db.session.commit()
+                create_new_map(longitude, latitude, new_address)
                 message = ok_message()[0]['Success']
                 return render_template('newAddress.html', message=message)
             else:
@@ -68,13 +60,7 @@ class UploadAddress(MethodView):
                 if user_postcode_coordinates:
                     latitude = user_postcode_coordinates[0].get('lat')
                     longitude = user_postcode_coordinates[0].get('lon')
-                    new_geo_map = Maps(
-                        lon=longitude,
-                        lat=latitude,
-                        location=new_address,
-                    )
-                    db.session.add(new_geo_map)
-                    db.session.commit()
+                    create_new_map(longitude, latitude, new_address)
                     message = ok_message()[0]['Success']
                     return render_template('newAddress.html', message=message)
 

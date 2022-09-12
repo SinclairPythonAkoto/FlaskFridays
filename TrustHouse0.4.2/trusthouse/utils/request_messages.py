@@ -5,11 +5,11 @@ def warning_message():
     For backend API reference both tuple indexes.
     For front end warning messages we only need to use the first tuple index : warning_message()[0]['Warning']
 
-    EG.     warning_message()[1] = {'status': 199}
-            warning_message()[1] = 200
+    warning_message( )[1] = {'status': 199}
+    warning_message( )[1] = 200
 
-            warning_message()[0] = warning message 
-            warning_message()[1] = status code
+    warning_message( )[0] = warning message 
+    warning_message( )[1] = status code
     
     Returns a tuple of dictionaries with the warning message and status.
     """
@@ -27,12 +27,12 @@ def error_message():
     For backend API reference both tuple indexes.
     For front end error messages we only need to use the first tuple index : error_message()[0]['Error']
 
-    EG.     error_message()[1] = {'status': 400}
-            error_message()[1] = 400
+    error_message( )[2] = {'status': 400}
+    error_message( )[2] = 400
 
-            error_message()[0] = error message 
-            error_message()[1] = no match found
-            error_message()[2] = status code
+    error_message( )[0] = error message 
+    error_message( )[1] = no match found
+    error_message( )[2] = status code
     
     Returns a tuple of dictionaries with the error message and status.
     """
@@ -51,13 +51,13 @@ def ok_message():
     For backend API reference both tuple indexes.
     For front end OK messages we only need to use the first tuple index : ok_message()[0]['Success']
 
-    EG.     ok_message()[2] = {'status': 200}
-            ok_message()[2] = 200
+    ok_message( )[2] = {'status': 200}
+    ok_message( )[2] = 200
 
-            ok_message()[0] = good address & map details
-            ok_message()[1] = good review
-            ok_message()[2] = match found
-            ok_message()[3] = status code 
+    ok_message( )[0] = good address & map details
+    ok_message( )[1] = good review
+    ok_message( )[2] = match found
+    ok_message( )[3] = status code 
 
     returns a tuple of dictionaries with OK messages and the status.
     """

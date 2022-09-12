@@ -1,9 +1,9 @@
 from flask.views import MethodView
-from trusthouse.models.address import Address
 from trusthouse.models.review import Review
 from trusthouse.utils.validate_door import validate_door_request
+from trusthouse.utils.request_messages import error_message
 from flask import render_template, request
-from ..extensions import app, db
+from ..extensions import app
 
 
 class FilterByDoorNumber(MethodView):
@@ -11,7 +11,7 @@ class FilterByDoorNumber(MethodView):
         user_door_request = request.form['searchDoorNum']
         response = validate_door_request(user_door_request)
         if response == False:
-            void = 'No match found.'
+            void = error_message()[1]['Error']
             return render_template('searchReviewPage.html', void=void)
         filter_door = Review.query.all() 
         return render_template(

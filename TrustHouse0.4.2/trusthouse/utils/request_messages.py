@@ -31,15 +31,17 @@ def error_message():
             error_message()[1] = 400
 
             error_message()[0] = error message 
-            error_message()[1] = status code
+            error_message()[1] = no match found
+            error_message()[2] = status code
     
     Returns a tuple of dictionaries with the error message and status.
     """
     error = {
         'Error': 'Could not make your request. Please check and try again.'
     }
+    no_match = {'Error': 'No match found. Please check and try again.'}
     status = {'status': 400}
-    return error, status
+    return error, no_match, status
 
 
 def ok_message():
@@ -53,8 +55,9 @@ def ok_message():
             ok_message()[2] = 200
 
             ok_message()[0] = good address & map details
-            ok_message()[1] = good review 
-            ok_message()[2] = status code 
+            ok_message()[1] = good review
+            ok_message()[2] = match found
+            ok_message()[3] = status code 
 
     returns a tuple of dictionaries with OK messages and the status.
     """
@@ -64,5 +67,6 @@ def ok_message():
     good_review = {
         'Success': 'Your review has been successfully uploaded to Trust House.'
     }
+    match_found = {'Success': 'A match was found!'}
     status = {'status': 201}
-    return good_address, good_review, status
+    return good_address, good_review, match_found, status

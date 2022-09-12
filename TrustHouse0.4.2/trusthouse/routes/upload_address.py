@@ -44,8 +44,8 @@ class UploadAddress(MethodView):
                 return render_template('newAddress.html', message=message)
             else:
                 data = {
-                    'Unexpecte error': error_message()[0],
-                    'status': error_message()[0], 
+                    'Unexpected error': error_message()[0],
+                    'status': error_message()[2], 
                 }
                 return jsonify(data)
         else:

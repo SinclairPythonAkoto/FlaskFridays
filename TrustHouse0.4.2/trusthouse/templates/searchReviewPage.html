@@ -24,6 +24,15 @@
         <button type="submit" class="btn">Listed Locations</button>
     </form>
     <br><br><br>
+
+    {% if void %}
+    <div>
+        <p style="color: red;">
+            <b>{{ void }}</b>
+        </p>
+    </div>
+    {% endif %}
+
     <h1 class="container">Trust House Search Engine</h1>
     <br><br><br>
     <div >
@@ -38,14 +47,6 @@
         <input type="text" name="searchDoorNum" id="searchDoorNum" placeholder="Enter door number" required>
         <button type="submit" class="btn">Find Reviews</button>
     </form>
-    {% if void %}
-    <br><br><br><br><br><br><br><br>
-    <div class="container">
-        <p style="color: red;">
-            <b>{{ void }}</b>
-        </p>
-    </div>
-    {% endif %}
     <br><br><br><br><br><br><br><br>
     <form action="{{ url_for('filter_street') }}" method="post" class="container" style="border-right: 5px solid red;">
         <label for="searchStreetName">Find Review by Street Name: </label><br>
@@ -66,7 +67,6 @@
     </form>
 
     {% if void %}
-    <br><br><br><br><br><br><br><br>
     <div class="container">
         <h1>{{ error }}</h1>
     </div>

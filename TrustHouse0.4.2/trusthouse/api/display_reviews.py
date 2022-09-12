@@ -1,13 +1,15 @@
 from flask.views import MethodView
 from trusthouse.models.review import Review
 from flask import jsonify
+
+from trusthouse.utils.request_messages import ok_message
 from ..extensions import app
 
 
 class AllReviewsAPI(MethodView):
     def get(self):
         all_reviews = Review.query.all()
-        res = []
+        review_result = []
         print(all_reviews)
         for review in all_reviews:
             result = {
@@ -24,8 +26,12 @@ class AllReviewsAPI(MethodView):
                     'Postode': review.address.postcode,
                 },
             }
-            res.append(result)
-        data = {'All reviews': res}
+            review_result.append(result)
+        data = {
+            'Search all reviews': ok_message()[2],
+            'Display Reviews': review_result,
+            'Status': ok_message()[3],
+        }
         return jsonify(data)
 
 

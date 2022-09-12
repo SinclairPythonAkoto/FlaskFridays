@@ -2,6 +2,7 @@ from flask import render_template, request
 from flask.views import MethodView
 from trusthouse.models.review import Review
 from trusthouse.utils.validate_postcode import validate_postcode_request
+from trusthouse.utils.request_messages import error_message
 from ..extensions import app
 
 
@@ -10,7 +11,7 @@ class FilterByPostcode(MethodView):
         user_postcode_request = request.form['searchPostcode']
         response = validate_postcode_request(user_postcode_request)
         if response == False:
-            void = 'No match found.'
+            void = error_message()[1]['Error']
             return render_template('searchReviewPage.html', void=void)
         filter_postcode = Review.query.all()
         return render_template(

@@ -1,6 +1,8 @@
 from flask.views import MethodView
 from trusthouse.models.address import Address
 from flask import jsonify
+
+from trusthouse.utils.request_messages import ok_message
 from ..extensions import app
 
 
@@ -17,7 +19,11 @@ class DisplayAllAddressesAPI(MethodView):
                 'Postcode': address.postcode,
             }
             db_query_result.append(result)
-        data = {'All Addresses': db_query_result}
+        data = {
+            'Search all addresses': ok_message()[2],
+            'Display Addresses': db_query_result,
+            'Status': ok_message()[3],
+        }
         return jsonify(data)
 
 

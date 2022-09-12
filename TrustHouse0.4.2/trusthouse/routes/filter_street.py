@@ -1,6 +1,7 @@
 from flask.views import MethodView
 from trusthouse.models.review import Review
 from trusthouse.utils.validate_street import validate_street_request
+from trusthouse.utils.request_messages import error_message
 from flask import render_template, request
 from ..extensions import app
 
@@ -10,7 +11,7 @@ class FilterByStreetName(MethodView):
         user_street_request = request.form['searchStreetName']
         response = validate_street_request(user_street_request)
         if response == False:
-            void = 'No match found.'
+            void = error_message()[1]['Error']
             return render_template('searchReviewPage.html', void=void)
         filter_street = Review.query.all()
         return render_template(

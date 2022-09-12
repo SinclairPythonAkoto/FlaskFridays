@@ -1,6 +1,7 @@
 from flask.views import MethodView
 from trusthouse.models.review import Review
 from trusthouse.utils.validate_location import validate_location_request
+from trusthouse.utils.request_messages import error_message
 from flask import render_template, request
 from ..extensions import app
 
@@ -10,7 +11,7 @@ class FilterByLocation(MethodView):
         user_location_request = request.form['searchLocation']
         response = validate_location_request(user_location_request)
         if response == False:
-            void = 'No match found.'
+            void = error_message()[1]['Error']
             return render_template('searchReviewPage.html', void=void)
         filter_location = Review.query.all()
         return render_template(

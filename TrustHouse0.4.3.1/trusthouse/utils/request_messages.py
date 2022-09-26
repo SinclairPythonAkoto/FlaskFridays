@@ -33,6 +33,7 @@ def error_message():
     error_message( )[0] = error message 
     error_message( )[1] = no match found
     error_message( )[2] = status code
+    error_message( )[3] = business error
     
     Returns a tuple of dictionaries with the error message and status.
     """
@@ -41,7 +42,8 @@ def error_message():
     }
     no_match = {'Error': 'No match found. Please check and try again.'}
     status = {'status': 400}
-    return error, no_match, status
+    business_error = {'Error': 'Your listing could not be uploaded, we could not locate the co-ordinates of the postcode given.'}
+    return error, no_match, status, business_error
 
 
 def ok_message():
@@ -57,7 +59,8 @@ def ok_message():
     ok_message( )[0] = good address & map details
     ok_message( )[1] = good review
     ok_message( )[2] = match found
-    ok_message( )[3] = status code 
+    ok_message( )[3] = status code
+    ok_message( )[4] = good business upload
 
     returns a tuple of dictionaries with OK messages and the status.
     """
@@ -69,4 +72,5 @@ def ok_message():
     }
     match_found = {'Success': 'A match was found!'}
     status = {'status': 201}
-    return good_address, good_review, match_found, status
+    good_buisness = {'Success': 'Your business has been successfully uploaded to Trust House.'}
+    return good_address, good_review, match_found, status, good_buisness

@@ -1,7 +1,7 @@
 from trusthouse.models.buisness import Buisness
 from ..extensions import db, app
 
-def create_new_buisness(buisness_name, buisness_category, buisness_services, contact_details):
+def create_new_buisness(buisness_name, buisness_category, buisness_services, contact_details, address):
     """
     Creates a new buisness entry, storing it in the Buisness table.
     Each new entry is linked to the Address id and Maps id.
@@ -14,6 +14,7 @@ def create_new_buisness(buisness_name, buisness_category, buisness_services, con
             category=buisness_category.lower(),
             services=buisness_services.lower(),
             contact=contact_details.lower(),
+            place=address,
         )
         db.session.add(new_buisness_entry)
         db.session.commit()

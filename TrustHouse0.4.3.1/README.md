@@ -163,7 +163,7 @@ As mentioned before, we can see that `welcome_screen.py` depends on the `trustho
 *However, for my scenario, because I want to have the possibility to easily extend my app, I will use this design pattern as recommended by the Flask documentation. *
 
 
-### Setup.py ##
+### Setup.py ###
 If we try to run our file now you will see it will not work.
 This is because Python is *stopping us from setting up a module as a start-up file*.
 We can avoid our code from breaking by creating a file called `setup.py` in the *parent directory*.
@@ -323,13 +323,13 @@ In most cases, the need to refactor will be due to the coe being repeated across
 Most of the refactoring will be changing repetative tasks *(like checking if a value exists in the database)* into functions.
 
 
-# Trust House v.0.4.3 #
+# Trust House v.0.4.3.1 #
 In this version I will create the functionality for users to be able to add their business details to the Trust House map via a backend API.
 
 I will have to include an extra database table for the buisness names, contact etc.  
 For now I will recreate the database tables again, but in the future I will have to know how to migrate database tables.
 
-I will create a new file in the `models` module called `buisness.py` - this is where I will craete an extra database table called `Buisness`.
+I will create a new file in the `models` module called `buisness.py` - this is where I will create an extra database table called `Buisness` *(spelling mistake will be amended)*.
 The `Buisness` table will have a *One to Many* relationship with the `Address` table.
 It will store the buisness name, business category, short description of services and contact details.
 The table will also have a `ForeignKey` that will be linked ot the `Address` db model.
@@ -342,7 +342,7 @@ class Buisness(db.Model):
     contact = db.Column(db.String(50), nullable=False)
     addres_id = db.Column(db.Integer, db.ForeignKey('address.id'))
 ```
-In the `Address` table I will then craete an additional db realtionship called `buisnesses`,
+In the `Address` table I will then create an additional db realtionship called `buisnesses`,
 where I link it to the `Buisness` table and give it an attribute called `address`.
 ```
 class Address(db.Model):
@@ -353,7 +353,7 @@ class Address(db.Model):
     postcode = db.Column(db.String(10), nullable=False)
     geo_map = db.relationship('Maps', backref='location', uselist=False)
     reviews = db.relationship('Review', backref='address')
-    buisnesses = db.relationship('Buisness', backref='address')
+    buisnesses = db.relationship('Buisness', backref='place')
 ```
 To create the database tables I found that that process before wasn't creating all the tables, if not any at all.
 To solve this, I found I had to individually import each db model instead of trying to import them all in one line.
@@ -368,6 +368,91 @@ from trusthouse.models.buisness import Buisness
 db.init_app(app)
 db.create_all(app=app)
 ```
+
+### Uploading New Business ###
+The idea behind this is to allow any user to upload their business credentials into the Trust House map.  The identification on the map will be different from the reviews located on the map.
+
+First I check if the user's postcode exists:
+```
+check_postcode = validate_postcode_request(postcode)
+```
+Next what I do is a little different, because my logic is based around the map co-ordinates, the same process is taken whether `check_postcode` is `True` or `False`.  *You could argue that I would not need to validate the user postcode, but fir now I will leave it as it is until I make futher updates.*
+
+From the user's postcode, I attempt to obtain the co-ordinates (longitude & latitude).
+```
+user_postcode_coordinates = get_postcode_coordinates(postcode)
+```
+
+If `user_postcode_coordinates` is `False` or returns an empty list, it means that even if I save the details in the database, I will not be able to display the information back to the map because there was no co-ordinates.  
+For this raeson, an error message will be returned as a jason format.
+```
+if user_postcode_coordinates == []:
+    message = error_message()[3]
+    data = {
+        'Error': message
+    }
+    return jsonify(data)
+```
+
+If there is a positive response from the usr request (if the list is not empty), it means it will have the longitude & latitude co-ordinates needed to create a point on the map later.
+The buisness address is stored in the `Address` table, which stores it's co-ordinates in the `Maps` table, and then the buisness details are stored in the `Buisness` table.
+```
+elif user_postcode_coordinates:
+    new_address = create_new_address(
+        door_num.lower(),
+        streetname.lower(),
+        location.lower(),
+        postcode.lower(),
+    )
+    latitude = user_postcode_coordinates[0].get('lat')
+    longitude = user_postcode_coordinates[0].get('lon')
+    create_new_map(longitude, latitude, new_address)
+    create_new_buisness(
+        name.lower(),
+        category.lower(),
+        services.lower(),
+        contact.lower(),
+        new_address,
+    )
+    data = {
+        'Successful upload': ok_message()[4],
+        'Status': ok_message()[3],
+        'New Upload': {
+            'Business Name': name.lower(),
+            'Business Category': category.lower(),
+            'Services': services.lower(),
+            'Contact': contact.lower(),
+            'Business Address': {
+                'Door Number': door_num.lower(),
+                'Street': streetname.lower(),
+                'Location': location.lower(),
+                'Postcode': postcode.lower(),
+            },
+        },
+    }
+    return jsonify(data)
+``` 
+As mentioned before, the same logic would be executed for both True and False outcomes - so essentially I would be repeating the same code twice if I extended the *if-else* statements.
+
+
+### Map Pointers ###
+With the Trust House app now layed out in a modular setting, it makes it easier to add addition to the code - both new & existing.
+
+To make an additional marker to the map I would simply have to create an additional **Folium Marker** to *add* to the map (in the `map` variable).
+I create a *nested for-loop* to *first* iterate through all the co-ordinates, then *secondly* iterate through all the buisness entries.
+I would check if any had matching `address_id` numbers, then only display the information if the ID matched.
+The colour of the marker has been changed to green, along with the sign being changed to the GBP pound sign - to create a clear distinction between the two markers.
+```
+for trusthouse_map in coordinates:
+    for buisness in business_data:
+        if trusthouse_map.address_id == buisness.address_id:
+            folium.Marker(
+                location=[float(trusthouse_map.lat), float(trusthouse_map.lon)],
+                popup=f'{buisness.name.upper()}\n{buisness.category}\n{buisness.services}\n{buisness.contact}\n{buisness.place.postcode.upper()}',
+                tooltip='View Buisness',
+                icon=folium.Icon(color='green', icon='gbp', prefix='fa')
+            ).add_to(map)
+``` 
 
 
 ### Run the App ###

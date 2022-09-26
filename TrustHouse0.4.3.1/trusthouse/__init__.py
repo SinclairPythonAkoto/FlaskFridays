@@ -39,3 +39,5 @@ import trusthouse.api.filter_location
 import trusthouse.api.filter_postcode
 # create new address via backend api
 import trusthouse.api.new_address
+# create new buisness address
+import trusthouse.api.new_buisness

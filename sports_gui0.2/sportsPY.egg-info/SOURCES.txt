@@ -1,0 +1,9 @@
+README.md
+setup.py
+sportsPY/__init__.py
+sportsPY/extensions.py
+sportsPY.egg-info/PKG-INFO
+sportsPY.egg-info/SOURCES.txt
+sportsPY.egg-info/dependency_links.txt
+sportsPY.egg-info/requires.txt
+sportsPY.egg-info/top_level.txt

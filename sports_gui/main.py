@@ -91,7 +91,8 @@ def new_session():
 def view_sessions():
     project = Project.query.all()
     students = Student.query.all()
-    return render_template('view_projects.html', project=project, students=students)
+    get_students = Student.query.all()
+    return render_template('view_projects.html', project=project, students=students, get_students=get_students)
 
 
 @app.route("/view_stats")

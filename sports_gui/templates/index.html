@@ -16,6 +16,11 @@
 <a href="" class="button">View Table</a>
 <a href="" class="button">View Stats</a>
 <br>
+{% if message %}
+    <p style="color: green;">
+        {{ message }}
+    </p>
+{% endif %}
 <!-- <label for="name">Name</label>
 <input type="text" name="student_name" id="student_name"> -->
 <script src="../static/jquery-3.4.1.min.js"></script>

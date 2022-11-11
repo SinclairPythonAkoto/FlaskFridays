@@ -1,5 +1,5 @@
 from flask import Flask  
-from flask import render_template, request, url_for
+from flask import render_template, request, url_for, redirect
 from flaskwebgui import FlaskUI
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -18,14 +18,14 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
-    student = db.relationship('Student', backref='students')
+    student = db.relationship('Student', backref='project')
 
 
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    result = db.relationship('Score', backref='results')
+    result = db.relationship('Score', backref='pupil')
 
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -48,7 +48,44 @@ def new_session():
     if request.method == 'GET':
         return render_template('new_session.html')
     else:
-        return "Your data has been sent"
+        project = request.form['session_name']
+        student1 = request.form['student1']
+        student2 = request.form['student2']
+        student3 = request.form['student3']
+
+        project_name = Project(
+            name = project,
+            date = datetime.now(),
+        )
+        db.session.add(project_name)
+        db.session.commit()
+
+        new_student = Student(
+            name = student1,
+            project = project_name,
+        )
+        db.session.add(new_student)
+        db.session.commit()
+
+        new_student = Student(
+            name = student2,
+            project = project_name,
+        )
+        db.session.add(new_student)
+        db.session.commit()
+
+        new_student = Student(
+            name = student3,
+            project = project_name,
+        )
+        db.session.add(new_student)
+        db.session.commit()
+
+
+
+        message = "New project created!"
+
+        return render_template('index.html', message=message)
 
 @app.route("/view_table")
 def view_table():

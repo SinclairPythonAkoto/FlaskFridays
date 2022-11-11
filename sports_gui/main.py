@@ -14,12 +14,25 @@ app.config['SQLACHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
 # create the db tables
-class NewSession(db.Model):
+class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    session_name = db.Column(db.String(50), nullable=False)
-    student_name = db.Column(db.String(30), nullable=False)
-    student_score = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
+    student = db.relationship('Student', backref='students')
+
+
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    result = db.relationship('Score', backref='results')
+
+class Score(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    score = db.Column(db.Integer, nullable=False)
+    notes = db.Column(db.Text, nullable=True)
+    date = db.Column(db.DateTime, nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
 
 
 @app.route("/")

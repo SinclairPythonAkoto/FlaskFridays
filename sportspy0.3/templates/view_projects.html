@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Projects</title>
+</head>
+<body>
+    <h1>View Sessions</h1>
+
+    <p>{{ project }}</p>
+    <p>{{ students }}</p>
+    <br>
+    {% for p in project %}
+        <h3>{{ p.name }}</h3>
+        {% for s in students %}
+            <p>{{ s.name }}</p>
+        {% endfor %}
+    {% endfor %}
+    <br>
+    {% for s in students %}
+        <h3>{{ s.project.name }}</h3>
+        <p>{{ s.name }}</p>
+    {% endfor %}
+    <br>
+    <h2>All Students</h2>
+    {% if get_students %}
+        {% for s in students %}
+            <p>
+                <b>{{ s.project.name }} : </b>
+                <i>{{ s.name }}</i>
+            </p>
+        {% endfor %}
+    {% endif %}
+    <a href="\" class="button">Return to Menu</a>
+</body>
+</html>

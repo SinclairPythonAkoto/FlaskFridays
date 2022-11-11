@@ -87,9 +87,12 @@ def new_session():
 
         return render_template('index.html', message=message)
 
-@app.route("/view_table")
-def view_table():
-    return "View data table"
+@app.route("/view_sessions")
+def view_sessions():
+    project = Project.query.all()
+    students = Student.query.all()
+    return render_template('view_projects.html', project=project, students=students)
+
 
 @app.route("/view_stats")
 def view_stats():

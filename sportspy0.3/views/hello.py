@@ -11,4 +11,4 @@ hello = Blueprint(
 
 @hello.route("/")
 def hello_world():
-    return render_template("hello_world.html")
+    return render_template("landingpage.html")

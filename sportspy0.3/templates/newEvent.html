@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Create New Sports Session
+{% endblock %}
+
+{% block header %}
+    <h1>Create Event</h1>
+{% endblock %}
+
+{% block content %}
+    <div>
+        <p>Please fill in the details below to create a new sports session.</p>
+    </div>
+    <br>
+    <div>
+        <form action="/newEvent" method="post">
+            <label for="eventName">Title</label>
+            <input type="text" name="eventName" id="eventName" placeholder="Event Name.." required>
+            <br>
+            <p>
+                Enter the names of your students.
+            </p>
+            <br>
+            <label for="student1">Student 1</label>
+            <input type="text" name="student1" id="student1" placeholder="Student name" required>
+            <label for="student2">Student 2</label>
+            <input type="text" name="student2" id="student2" placeholder="Student name" required>
+            <label for="student3">Student 3</label>
+            <input type="text" name="student3" id="student3" placeholder="Student name" required>
+            <br>
+            <button type="submit" class="button">Create New Session</button>
+            <br>
+        </form>
+    </div>
+{% endblock %}
